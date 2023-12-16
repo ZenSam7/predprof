@@ -1,7 +1,10 @@
+from draw import draw
+
+
 def ifblock(dir: str):
     """Проверяем, можно ли идти в нужное направление"""
     # Если в dir опечатка, то вызываем ошибку
-    if not (dir in ("RIGHT", "LEFT", "UP", "DOWN")):
+    if not (dir in ("LEFT", "RIGHT", "UP", "DOWN")):
         raise ValueError(f"Несуществующее направление: {dir}")
 
     possible: bool = (dir == "RIGHT" and coords[0] == 20) or \
@@ -20,7 +23,7 @@ def __check_available_value(value: [str, int]):
         return None
 
     # Если value это число
-    if isinstance(value, int):
+    elif isinstance(value, int):
         pass
 
     # Если value это число в виде строки
@@ -90,8 +93,25 @@ def down(value: [str, int]):
 
 
 def set(variable_and_value: str):
-    # Убираем все пробелы
-    variable_and_value = variable_and_value.replace(" ", "")
+    """Устанавливаем для переменной нужное значение"""
+    global vars
+
+    name_var, value = variable_and_value.split("=")
+
+    value = __check_available_value(value)
+
+    vars[name_var] = value
+
+
+def call(name_proc: str):
+    """Выполняем процедуру"""
+    try:
+        procedure_code = procedures[name_proc]
+    except KeyError:
+        raise ValueError(f"Неизвестное название процедуры: {name_proc}")
+
+    # Код процедуры выполняем отдельно
+    run(procedure_code)
 
 
 # Сюда записываем все команды в формате: ["имя_команды": функция]
@@ -101,6 +121,7 @@ all_commands = {"IFBLOCK": ifblock,
                 "LEFT": left,
                 "RIGHT": right,
                 "SET": set,
+                "CALL": call,
 
                 "ENDREPEAT": pass_func,
                 "ENDIF": pass_func,
@@ -113,6 +134,79 @@ coords = [0, 0]  # Начало координат: слева сверху
 vars = {}  # Все переменные тут
 procedures = {}  # Все процедуры тут
 
-# Выполняем команды по 1 строчке
-# Этот указатель будем гонять туда-сюда по всему коду
-command_ind: int = 0
+
+def iter_command(code: list[str], command_ind: int) -> int:
+    """Интепретируем (выполняем) команду и возвращаем индекс
+     команды на котором остановились"""
+    global procedures
+    string = code[command_ind]
+
+    draw(coords, string)
+
+    # Разбиваем команду на название команды и значение этой команды
+    if string.startswith("END"):
+        command, value = string, None
+    else:
+        command, value = string.split(maxsplit=1)
+
+    # Если у нас команда, которая принимает целый блок кода, то с ними поступаем иначе
+    if command == "IFBLOCK":
+        """Если у нас IFBLOCK вернул False, то пропускаем команды до ENDIF
+           Если он вернул True, то просто прожолжаем выполнять команды"""
+
+        if not all_commands[command](value):
+            skip = command_ind
+            while code[skip] != "ENDIF":
+                skip += 1
+            return skip
+
+    elif command == "REPEAT":
+        """Рекурсивно выполняем блок кода от command_ind до endrepeat_index"""
+        # Вычисляем промежуток строк который должны повторить
+        startrepeat_index = command_ind + 1
+        endrepeat_index = command_ind
+        while code[endrepeat_index] != "ENDREPEAT":
+            endrepeat_index += 1
+
+        # Проверяем правильность value (может быть как числом так и переменной)
+        value = __check_available_value(value)
+
+        for N in range(value):
+            index = startrepeat_index
+            while index < endrepeat_index:
+                index = iter_command(code, index)
+                index += 1
+
+        return endrepeat_index
+
+    elif command == "PROCEDURE":
+        """В procedures записываем название процедуры и его код"""
+        procedure_code = []
+
+        while code[command_ind] != "ENDPROC":
+            command_ind += 1
+            procedure_code.append(code[command_ind])
+
+        # Записываем код для соответствующей процедуры
+        procedures[value] = procedure_code
+        return command_ind
+
+    elif command in ("LEFT", "RIGHT", "UP", "DOWN"):
+        # Проверяем правильность value для команд right/left/up/down и repeat
+        value = __check_available_value(value)
+
+    # Просто выполняем команду без всяких заморочек
+    all_commands[command](value)
+    return command_ind
+
+
+def run(code: list[str]):
+    """Выполняем предоставленный код"""
+    # Выполняем команды по 1 строчке
+    # Этот указатель будем гонять туда-сюда по всему коду
+    command_ind: int = 0
+
+    while command_ind < len(code):
+        # Выполняем команду и Двигаемся дальше
+        command_ind = iter_command(code, command_ind)
+        command_ind += 1

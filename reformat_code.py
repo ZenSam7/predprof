@@ -65,6 +65,16 @@ def code_for_user(raw_code: list[str]) -> list[str]:
     while "\n\n\n\n" in code:
         code = code.replace("\n\n\n\n", "\n\n\n")
 
+    # Убираем лишние пустые строки в конце файла
+    while code[-1] == "\n":
+        code = code[:-1]
+
+    code = [string+"\n" for string in code.split("\n")]
+
+    # Если для последней строки есть отступ, то мы что-то написани не так
+    if amount_indent != 0:
+        raise Exception("Ошибка коде! Проверьте правильность написания команд")
+
     return code
 
 
@@ -87,14 +97,14 @@ def code_for_interpeter(raw_code: list[str]) -> list[str]:
     code_for_interpreter = []
 
     # Записываем все не пустые строки в code, убираем "\n" и отступы
-    for command in code_for_user(raw_code):
-        if command == "\n":
+    for string in code_for_user(raw_code):
+        if string == "\n":
             continue
-        if command.endswith("\n"):
-            command = command[:-1]
+        if string.endswith("\n"):
+            string = string[:-1]
 
-        command = command.strip()  # Обрезаем отступы
+        string = string.strip()  # Обрезаем отступы
 
-        code_for_interpreter.append(command)
+        code_for_interpreter.append(string)
 
     return code_for_interpreter
