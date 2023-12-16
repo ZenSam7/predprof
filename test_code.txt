@@ -1,0 +1,26 @@
+RIght 1
+
+ifBLOCK doWN
+ UP 6
+      riGHT 1
+ENDIf
+
+procedure RightDown
+    repeat 2
+    ifblock up
+  righT x
+        endif
+    endrepeat
+endproc
+
+set X =      2
+set x =X
+
+
+
+
+
+
+
+
+call RightDown

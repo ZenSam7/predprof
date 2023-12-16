@@ -1,0 +1,20 @@
+RIGHT 1
+
+IFBLOCK DOWN
+    UP 6
+    RIGHT 1
+ENDIF 
+
+PROCEDURE RightDown
+    REPEAT 2
+        IFBLOCK UP
+            RIGHT x
+        ENDIF 
+    ENDREPEAT 
+ENDPROC 
+
+SET X=2
+SET x=X
+
+
+CALL RightDown
