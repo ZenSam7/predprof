@@ -1,4 +1,4 @@
-from draw import draw
+from frontend.draw_agent import draw
 
 
 def ifblock(dir: str):
@@ -111,7 +111,7 @@ def call(name_proc: str):
         raise ValueError(f"Неизвестное название процедуры: {name_proc}")
 
     # Код процедуры выполняем отдельно
-    run(procedure_code)
+    run_code(procedure_code)
 
 
 # Сюда записываем все команды в формате: ["имя_команды": функция]
@@ -140,8 +140,6 @@ def iter_command(code: list[str], command_ind: int) -> int:
      команды на котором остановились"""
     global procedures
     string = code[command_ind]
-
-    draw(coords, string)
 
     # Разбиваем команду на название команды и значение этой команды
     if string.startswith("END"):
@@ -195,12 +193,15 @@ def iter_command(code: list[str], command_ind: int) -> int:
         # Проверяем правильность value для команд right/left/up/down и repeat
         value = __check_available_value(value)
 
+    # Рисуем нашего агента
+    draw(coords, string)
+
     # Просто выполняем команду без всяких заморочек
     all_commands[command](value)
     return command_ind
 
 
-def run(code: list[str]):
+def run_code(code: list[str]):
     """Выполняем предоставленный код"""
     # Выполняем команды по 1 строчке
     # Этот указатель будем гонять туда-сюда по всему коду

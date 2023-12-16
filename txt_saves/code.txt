@@ -1,0 +1,39 @@
+RIGHT 1
+
+IFBLOCK DOWN
+    UP 6
+    RIGHT 1
+ENDIF 
+
+PROCEDURE RightDown
+    REPEAT 3
+        IFBLOCK UP
+            RIGHT x
+            DOWN 15
+        ENDIF 
+    ENDREPEAT 
+    LEFT 1
+ENDPROC 
+
+SET X=10
+SET x=X
+
+
+CALL RightDown
+
+
+SET amount_cycle=4
+
+PROCEDURE cycle
+    RIGHT X
+    UP x
+
+    IFBLOCK RIGHT
+        LEFT X
+        DOWN x
+    ENDIF 
+ENDPROC 
+
+REPEAT amount_cycle
+    CALL cycle
+ENDREPEAT 

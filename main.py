@@ -1,12 +1,14 @@
-from db_saver import *
-from reformat_code import *
-from interpreter import run
+from backend.db_saver import *
+from backend.reformat import *
+from backend.interpreter import run_code
 
-# Исходный код от пользователя
-raw_code = open("user_code.txt", "r").readlines()
+from frontend.interface import begin_app
 
-reformate_user_code()
-code = code_for_interpeter(raw_code)
+file = "code"  # Имя рабочего файла из txt_saves
 
-print(code)
-run(code)
+reformat_user_file_code(f"./txt_saves/{file}.txt")  # Делаем красиво
+import_from_file(f"./txt_saves/{file}.txt")  # Импортируем в бд
+
+run_code(db_load_for_interpreter(file))  # Запускаем
+
+# begin_app()  поидее это должен быть графический интерфейс

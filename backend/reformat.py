@@ -78,7 +78,7 @@ def code_for_user(raw_code: list[str]) -> list[str]:
     return code
 
 
-def reformate_user_code(file_path: str = "user_code.txt"):
+def reformat_user_file_code(file_path: str = "user_code.txt"):
     """Заменяем файл со старым кодом, на файл с нормальным кодом"""
     # Исходный код от пользователя
     raw_code = open(file_path, "r").readlines()
