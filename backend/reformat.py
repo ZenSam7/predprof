@@ -1,4 +1,5 @@
 from os import remove as remove_file
+from codecs import BOM
 
 
 def code_for_user(raw_code: list[str]) -> list[str]:
@@ -19,21 +20,32 @@ def code_for_user(raw_code: list[str]) -> list[str]:
         if string.endswith("\n"):
             string = string[:-1]
 
-        # Разбиваем строку на название команды и значение для этой команды
-        if string.upper().startswith("END"):
-            command, value = string, " "
+        # Определяем комментарии
+        if string.startswith("#"):
+            # Удаляем лишние пробелы
+            while "  " in string:
+                string = string.replace("  ", " ")
+
+            # Комментарий должен начинаться с Большой Буквы (а остальные маленькие)
+            string = "# " + string[1:].strip().capitalize()
+
+        # Если это не комментарий
         else:
-            command, value = string.split(maxsplit=1)
+            # Разбиваем строку на название команды и значение для этой команды
+            if string.upper().startswith("END"):
+                command, value = string, ""
+            else:
+                command, value = string.split(maxsplit=1)
 
-        # Убираем лишние пробелы после команды
-        value = value.replace(" ", "")
+            # Убираем лишние пробелы после команды
+            value = value.replace(" ", "")
 
-        # Если value это направление, то оно тоже в верхнем регистре
-        if value.upper() in ("LEFT", "RIGHT", "UP", "DOWN"):
-            value = value.upper()
+            # Если value это направление, то оно тоже в верхнем регистре
+            if value.upper() in ("LEFT", "RIGHT", "UP", "DOWN"):
+                value = value.upper()
 
-        # Делаем команду в верхнем регистре
-        string = command.upper() + " " + value
+            # Делаем команду в верхнем регистре
+            string = command.upper() + " " + value
 
         # Добавляем отступы
         string = " "*4 * amount_indent + string
@@ -66,9 +78,10 @@ def code_for_user(raw_code: list[str]) -> list[str]:
         code = code.replace("\n\n\n\n", "\n\n\n")
 
     # Убираем лишние пустые строки в конце файла
-    while code[-1] == "\n":
+    while code.endswith("\n"):
         code = code[:-1]
 
+    # Разделяем по строкам
     code = [string+"\n" for string in code.split("\n")]
 
     # Если для последней строки есть отступ, то мы что-то написани не так
@@ -78,16 +91,22 @@ def code_for_user(raw_code: list[str]) -> list[str]:
     return code
 
 
-def reformat_user_file_code(file_path: str = "user_code.txt"):
-    """Заменяем файл со старым кодом, на файл с нормальным кодом"""
+def reformat_user_file_code(file_path: str, new_file_path: str = None):
+    """Создаём или заменяем на файл с красивым кодом"""
+    # Это надо чтобы можно было писать комментарии на русском
+    open(file_path, "r+b").write(BOM)
     # Исходный код от пользователя
-    raw_code = open(file_path, "r").readlines()
+    raw_code = open(file_path, "rt", encoding="utf-16").readlines()
 
-    # Форматируем код (удаляем файл с старым кодом и заменяем на нормальный)
+    # Форматируем код
     code = code_for_user(raw_code)
-    remove_file(file_path)
 
-    with open(file_path, "w+") as user_file:
+    # Если мы хотим ЗАМЕНИТЬ файл с кодом на нормальный, то удаляем его
+    if new_file_path is None:
+        remove_file(file_path)
+        new_file_path = file_path
+
+    with open(new_file_path, "w+", encoding="utf-16") as user_file:
         for string in code:
             user_file.write(string)
 
@@ -96,7 +115,7 @@ def code_for_interpeter(raw_code: list[str]) -> list[str]:
     """Форматируем код для интерпретатора (убираем пустые строки и отступы)"""
     code_for_interpreter = []
 
-    # Записываем все не пустые строки в code, убираем "\n" и отступы
+    # Записываем все не пустые строки в code, убираем: "\n", отступы и комментарии
     for string in code_for_user(raw_code):
         if string == "\n":
             continue
@@ -104,6 +123,9 @@ def code_for_interpeter(raw_code: list[str]) -> list[str]:
             string = string[:-1]
 
         string = string.strip()  # Обрезаем отступы
+
+        if string.startswith("#"):
+            continue
 
         code_for_interpreter.append(string)
 

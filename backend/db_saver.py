@@ -62,13 +62,13 @@ def create_new_table():
 
 def export_to_txt(name: str):
     """Экспортируем сохранение из бд в дайл"""
-    with open(f"txt_saves/{name}.txt", "w+") as file:
+    with open(f"txt_saves/{name}.txt", "w+", encoding="utf-16") as file:
         file.write(db_load(name))
 
 
 def import_from_file(file_path: str):
     """Импортируем сохранение в бд из файла"""
-    with open(file_path, "r") as file:
+    with open(file_path, "r", encoding="utf-16") as file:
         code = "".join(file.readlines())
 
     # Има сохранения == название файла
