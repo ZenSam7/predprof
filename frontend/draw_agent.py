@@ -10,16 +10,20 @@ pygame.display.set_caption("Predprof")
 
 
 def draw(coords: list[int, int], string: str):
+    pygame.event.get()
+
     # Фон
     wind.fill((40, 50, 60))
 
     # Сетка
     for x in range(0, 22):
         for y in range(0, 22):
-            pygame.draw.rect(wind,
-                             (90, 100, 110),
-                             (x*cell_size, y*cell_size, cell_size+1, cell_size+1),
-                             1)
+            pygame.draw.rect(
+                wind,
+                (90, 100, 110),
+                (x * cell_size, y * cell_size, cell_size + 1, cell_size + 1),
+                1,
+            )
 
     # Агент
     pygame.draw.rect(
@@ -30,7 +34,7 @@ def draw(coords: list[int, int], string: str):
             coords[1] * cell_size,
             cell_size,
             cell_size,
-        )
+        ),
     )
 
     # Выводим команду

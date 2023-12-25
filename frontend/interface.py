@@ -17,10 +17,13 @@ window.geometry(f"{21*cell_size + edit_field_width}x{21*cell_size}")
 
 
 # Поле для кода
-edit_field = scrolledtext.ScrolledText(window,
-                                       width=edit_field_width,
-                                       font=("Calibri", text_size),
-                                       fg="#222", bg="#eee",)
+edit_field = scrolledtext.ScrolledText(
+    window,
+    width=edit_field_width,
+    font=("Calibri", text_size),
+    fg="#222",
+    bg="#eee",
+)
 
 edit_field.pack(side="left", fill="y", expand=False)
 

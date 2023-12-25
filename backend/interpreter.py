@@ -7,16 +7,20 @@ def ifblock(dir: str):
     if not (dir in ("LEFT", "RIGHT", "UP", "DOWN")):
         raise ValueError(f"Несуществующее направление: {dir}")
 
-    possible: bool = (dir == "RIGHT" and coords[0] == 20) or \
-                     (dir == "LEFT" and coords[0] == 0) or \
-                     (dir == "UP" and coords[1] == 0) or \
-                     (dir == "DOWN" and coords[1] == 20)
+    possible: bool = (
+        (dir == "RIGHT" and coords[0] == 20)
+        or (dir == "LEFT" and coords[0] == 0)
+        or (dir == "UP" and coords[1] == 0)
+        or (dir == "DOWN" and coords[1] == 20)
+    )
     return possible
 
 
-def __check_available_value(value: [str, int]):
+def __check_available_value(value: [str, int], name: str = None):
     """Проверяем чтобы значение было [1; 1000] и возвращаем это
-     значение чтобы лишний раз не доставать из переменной"""
+    значение чтобы лишний раз не доставать из переменной
+
+    Также чтобы было понятно где ошибка, можем передать имя переменоой"""
     global vars
 
     if value is None:
@@ -26,8 +30,8 @@ def __check_available_value(value: [str, int]):
     elif isinstance(value, int):
         pass
 
-    # Если value это число в виде строки
-    elif value.isdigit():
+    # Если value это число в виде строки (положительное или отрицательное)
+    elif value.isdigit() or (value.startswith("-") and value[1:].isdigit()):
         value = int(value)
 
     # Если value это переменная
@@ -43,7 +47,7 @@ def __check_available_value(value: [str, int]):
 
     # Проверяем под диапазон
     if not 1 <= value <= 1000:
-        raise ValueError(f"Выход за границы допустимых значений [1; 1000]: {value}")
+        raise ValueError(f"Выход за границы допустимых значений [1; 1000]: {value} ({name})")
 
     return value
 
@@ -98,7 +102,7 @@ def set(variable_and_value: str):
 
     name_var, value = variable_and_value.split("=")
 
-    value = __check_available_value(value)
+    value = __check_available_value(value, name=name_var)
 
     vars[name_var] = value
 
@@ -115,18 +119,18 @@ def call(name_proc: str):
 
 
 # Сюда записываем все команды в формате: ["имя_команды": функция]
-all_commands = {"IFBLOCK": ifblock,
-                "UP": up,
-                "DOWN": down,
-                "LEFT": left,
-                "RIGHT": right,
-                "SET": set,
-                "CALL": call,
-
-                "ENDREPEAT": pass_func,
-                "ENDIF": pass_func,
-                "ENDPROC": pass_func,
-                }
+all_commands = {
+    "IFBLOCK": ifblock,
+    "UP": up,
+    "DOWN": down,
+    "LEFT": left,
+    "RIGHT": right,
+    "SET": set,
+    "CALL": call,
+    "ENDREPEAT": pass_func,
+    "ENDIF": pass_func,
+    "ENDPROC": pass_func,
+}
 
 # Инициализируем переменные для интерпретатора
 coords = [0, 0]  # Начало координат: слева сверху
@@ -137,7 +141,7 @@ procedures = {}  # Все процедуры тут
 
 def iter_command(code: list[str], command_ind: int) -> int:
     """Интепретируем (выполняем) команду и возвращаем индекс
-     команды на котором остановились"""
+    команды на котором остановились"""
     global procedures
     string = code[command_ind]
 
@@ -150,7 +154,7 @@ def iter_command(code: list[str], command_ind: int) -> int:
     # Если у нас команда, которая принимает целый блок кода, то с ними поступаем иначе
     if command == "IFBLOCK":
         """Если у нас IFBLOCK вернул False, то пропускаем команды до ENDIF
-           Если он вернул True, то просто прожолжаем выполнять команды"""
+        Если он вернул True, то просто прожолжаем выполнять команды"""
 
         if not all_commands[command](value):
             skip = command_ind
@@ -185,8 +189,12 @@ def iter_command(code: list[str], command_ind: int) -> int:
             command_ind += 1
             procedure_code.append(code[command_ind])
 
-        # Записываем код для соответствующей процедуры
-        procedures[value] = procedure_code
+        # Записываем код для соответствующей процедуры, если она объявлена впервые
+        if not (value in procedures):
+            procedures[value] = procedure_code
+        else:
+            raise ValueError(f"Процедура {value} уже объявлена!")
+
         return command_ind
 
     elif command in ("LEFT", "RIGHT", "UP", "DOWN"):
@@ -196,8 +204,12 @@ def iter_command(code: list[str], command_ind: int) -> int:
     # Рисуем нашего агента
     draw(coords, string)
 
-    # Просто выполняем команду без всяких заморочек
-    all_commands[command](value)
+    # Просто выполняем команду
+    try:
+        all_commands[command](value)
+    except KeyError:
+        raise ValueError(f"Неизвестная команда: {command}")
+
     return command_ind
 
 

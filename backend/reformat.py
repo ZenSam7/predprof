@@ -2,6 +2,20 @@ from os import remove as remove_file
 from codecs import BOM
 
 
+def raise_error(func):
+    """Декоратор для функций, работающие с файлом"""
+
+    def try_run_func(*args, **kwargs):
+        # try:
+        return func(*args, **kwargs)
+        # except FileNotFoundError:
+        #     raise FileNotFoundError("Файла не существует")
+        # except Exception as err:
+        #     raise Exception(f"Проблемы с файлом")
+
+    return try_run_func
+
+
 def code_for_user(raw_code: list[str]) -> list[str]:
     """Форматируем код для пользователя
     (добавляем/убираем отступы, все комады пишем заглавными буквами)"""
@@ -48,7 +62,7 @@ def code_for_user(raw_code: list[str]) -> list[str]:
             string = command.upper() + " " + value
 
         # Добавляем отступы
-        string = " "*4 * amount_indent + string
+        string = " " * 4 * amount_indent + string
 
         # Увеличиваем или уменьшаем количество отступов для следующих строк
         if string.split()[0] in ("IFBLOCK", "REPEAT", "PROCEDURE"):
@@ -56,15 +70,17 @@ def code_for_user(raw_code: list[str]) -> list[str]:
 
             # Обрабатываем асимальное количество вложенных конструкций
             if amount_indent == 4:
-                raise Exception(f"Достугнуто максимальное количство "
-                                f"вложенных команд: 3 в строке {index+1 +1}")
+                raise Exception(
+                    f"Достугнуто максимальное количство "
+                    f"вложенных команд: 3 в строке {index + 1 + 1}"
+                )
 
         elif string.split()[0] in ("ENDIF", "ENDREPEAT", "ENDPROC"):
             amount_indent -= 1
 
             # Обрабатываем возможную ошибку
             if amount_indent < 0:
-                raise Exception(f"Лишняя команда: {string} в строке {index +1}")
+                raise Exception(f"Лишняя команда: {string} в строке {index + 1}")
 
             string = string[4:]
 
@@ -82,19 +98,24 @@ def code_for_user(raw_code: list[str]) -> list[str]:
         code = code[:-1]
 
     # Разделяем по строкам
-    code = [string+"\n" for string in code.split("\n")]
+    code = [string + "\n" for string in code.split("\n")]
 
     # Если для последней строки есть отступ, то мы что-то написани не так
     if amount_indent != 0:
-        raise Exception("Ошибка коде! Проверьте правильность написания команд")
+        raise Exception(
+            "Ошибка в коде! Проверьте правильность написания команд и "
+            "наличие всех ENDREPEAT, ENDIF и EDPROC"
+        )
 
     return code
 
 
+@raise_error
 def reformat_user_file_code(file_path: str, new_file_path: str = None):
     """Создаём или заменяем на файл с красивым кодом"""
     # Это надо чтобы можно было писать комментарии на русском
     open(file_path, "r+b").write(BOM)
+
     # Исходный код от пользователя
     raw_code = open(file_path, "rt", encoding="utf-16").readlines()
 
