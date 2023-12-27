@@ -1,4 +1,4 @@
-from os import remove as remove_file
+from os import remove
 from codecs import BOM
 
 
@@ -6,12 +6,12 @@ def raise_error(func):
     """Декоратор для функций, работающие с файлом"""
 
     def try_run_func(*args, **kwargs):
-        # try:
-        return func(*args, **kwargs)
-        # except FileNotFoundError:
-        #     raise FileNotFoundError("Файла не существует")
-        # except Exception as err:
-        #     raise Exception(f"Проблемы с файлом")
+        try:
+            return func(*args, **kwargs)
+        except FileNotFoundError:
+            raise FileNotFoundError("Файла не существует")
+        except Exception as err:
+            raise Exception(f"Проблемы с файлом")
 
     return try_run_func
 
@@ -124,7 +124,7 @@ def reformat_user_file_code(file_path: str, new_file_path: str = None):
 
     # Если мы хотим ЗАМЕНИТЬ файл с кодом на нормальный, то удаляем его
     if new_file_path is None:
-        remove_file(file_path)
+        remove(file_path)
         new_file_path = file_path
 
     with open(new_file_path, "w+", encoding="utf-16") as user_file:

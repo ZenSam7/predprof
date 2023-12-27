@@ -10,6 +10,10 @@ def _do_request(request: str):
         conn = sqlite3.connect("saves.db")
         cur = conn.cursor()
 
+        # Добавляем ";"
+        if not request.endswith(";"):
+            request += ";"
+
         # Выполняем запрос
         cur.execute(request)
         # Если что-то прочитали, что всё запишется в result
@@ -58,13 +62,16 @@ def db_delete(name: str):
 def create_new_table():
     """Создаём новую таблицу (зачем?)"""
     _do_request(
-        "create table if not exists saves (name text not null, code list text);"
+        "create table if not exists saves (name text not null, code longtext);"
     )
 
 
 @raise_error
 def export_to_txt(name: str):
     """Экспортируем сохранение из бд в дайл"""
+    # Убираем формат
+    name = name.split(".")[0] if "." in name else name
+
     # Если файл уже есть, то заменяем
     if (name + ".txt") in os.listdir("./txt_saves"):
         os.remove(f"txt_saves/{name}.txt")
