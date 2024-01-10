@@ -20,7 +20,7 @@ class my_window(QtWidgets.QMainWindow):
 
         file = "code"
 
-        with open(f"{file}.txt", 'r') as f:
+        with open(f"{file}.txt", 'r', encoding='utf-8') as f:
             self.ui.textEdit.setText(f.read())
 
         self.game = Game()
