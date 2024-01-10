@@ -1,15 +1,24 @@
 from backend.db_saver import *
 from backend.reformat import *
-from backend.interpreter import run_code
 
-file = "user_code"  # Имя рабочего файла из txt_saves
+from frontend.interface import my_window
+from PyQt5 import   QtWidgets
+import sys
 
-# Делаем красиво
-reformat_user_file_code(f"./txt_saves/{file}.txt", f"./txt_saves/code.txt")
+# НЕ РАБОТАЕТ!!!!!
 
-# Импортируем в бд
-import_from_file(f"./txt_saves/{file}.txt")
-import_from_file(f"./txt_saves/code.txt")
+file = "code"  # Имя рабочего файла из txt_saves
 
-# Запускаем
-run_code(db_load_for_interpreter(file))
+reformat_user_file_code(f"./txt_saves/{file}.txt")  # Делаем красиво
+import_from_file(f"./txt_saves/{file}.txt")  # Импортируем в бд
+
+app = QtWidgets.QApplication([])
+application = my_window()
+application.setFixedSize(1360, 780)
+application.show()
+
+sys.exit(app.exec())
+
+# НЕ РАБОТАЕТ!!!!!
+
+

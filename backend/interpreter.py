@@ -1,26 +1,19 @@
-from frontend.draw_agent import draw
-
-
 def ifblock(dir: str):
     """Проверяем, можно ли идти в нужное направление"""
     # Если в dir опечатка, то вызываем ошибку
     if not (dir in ("LEFT", "RIGHT", "UP", "DOWN")):
         raise ValueError(f"Несуществующее направление: {dir}")
 
-    possible: bool = (
-        (dir == "RIGHT" and coords[0] == 20)
-        or (dir == "LEFT" and coords[0] == 0)
-        or (dir == "UP" and coords[1] == 0)
-        or (dir == "DOWN" and coords[1] == 20)
-    )
+    possible: bool = (dir == "RIGHT" and coords[0] == 20) or \
+                     (dir == "LEFT" and coords[0] == 0) or \
+                     (dir == "UP" and coords[1] == 0) or \
+                     (dir == "DOWN" and coords[1] == 20)
     return possible
 
 
-def __check_available_value(value: [str, int], name: str = None):
+def __check_available_value(value: [str, int]):
     """Проверяем чтобы значение было [1; 1000] и возвращаем это
-    значение чтобы лишний раз не доставать из переменной
-
-    Также чтобы было понятно где ошибка, можем передать имя переменоой"""
+     значение чтобы лишний раз не доставать из переменной"""
     global vars
 
     if value is None:
@@ -30,8 +23,8 @@ def __check_available_value(value: [str, int], name: str = None):
     elif isinstance(value, int):
         pass
 
-    # Если value это число в виде строки (положительное или отрицательное)
-    elif value.isdigit() or (value.startswith("-") and value[1:].isdigit()):
+    # Если value это число в виде строки
+    elif value.isdigit():
         value = int(value)
 
     # Если value это переменная
@@ -47,7 +40,7 @@ def __check_available_value(value: [str, int], name: str = None):
 
     # Проверяем под диапазон
     if not 1 <= value <= 1000:
-        raise ValueError(f"Выход за границы допустимых значений [1; 1000]: {value} ({name})")
+        raise ValueError(f"Выход за границы допустимых значений [1; 1000]: {value}")
 
     return value
 
@@ -102,7 +95,7 @@ def set(variable_and_value: str):
 
     name_var, value = variable_and_value.split("=")
 
-    value = __check_available_value(value, name=name_var)
+    value = __check_available_value(value)
 
     vars[name_var] = value
 
@@ -119,18 +112,18 @@ def call(name_proc: str):
 
 
 # Сюда записываем все команды в формате: ["имя_команды": функция]
-all_commands = {
-    "IFBLOCK": ifblock,
-    "UP": up,
-    "DOWN": down,
-    "LEFT": left,
-    "RIGHT": right,
-    "SET": set,
-    "CALL": call,
-    "ENDREPEAT": pass_func,
-    "ENDIF": pass_func,
-    "ENDPROC": pass_func,
-}
+all_commands = {"IFBLOCK": ifblock,
+                "UP": up,
+                "DOWN": down,
+                "LEFT": left,
+                "RIGHT": right,
+                "SET": set,
+                "CALL": call,
+
+                "ENDREPEAT": pass_func,
+                "ENDIF": pass_func,
+                "ENDPROC": pass_func,
+                }
 
 # Инициализируем переменные для интерпретатора
 coords = [0, 0]  # Начало координат: слева сверху
@@ -139,9 +132,9 @@ vars = {}  # Все переменные тут
 procedures = {}  # Все процедуры тут
 
 
-def iter_command(code: list[str], command_ind: int) -> int:
+def iter_command(code: list[str], command_ind: int, game) -> int:
     """Интепретируем (выполняем) команду и возвращаем индекс
-    команды на котором остановились"""
+     команды на котором остановились"""
     global procedures
     string = code[command_ind]
 
@@ -154,7 +147,7 @@ def iter_command(code: list[str], command_ind: int) -> int:
     # Если у нас команда, которая принимает целый блок кода, то с ними поступаем иначе
     if command == "IFBLOCK":
         """Если у нас IFBLOCK вернул False, то пропускаем команды до ENDIF
-        Если он вернул True, то просто прожолжаем выполнять команды"""
+           Если он вернул True, то просто прожолжаем выполнять команды"""
 
         if not all_commands[command](value):
             skip = command_ind
@@ -189,12 +182,8 @@ def iter_command(code: list[str], command_ind: int) -> int:
             command_ind += 1
             procedure_code.append(code[command_ind])
 
-        # Записываем код для соответствующей процедуры, если она объявлена впервые
-        if not (value in procedures):
-            procedures[value] = procedure_code
-        else:
-            raise ValueError(f"Процедура {value} уже объявлена!")
-
+        # Записываем код для соответствующей процедуры
+        procedures[value] = procedure_code
         return command_ind
 
     elif command in ("LEFT", "RIGHT", "UP", "DOWN"):
@@ -202,18 +191,15 @@ def iter_command(code: list[str], command_ind: int) -> int:
         value = __check_available_value(value)
 
     # Рисуем нашего агента
-    draw(coords, string)
+    print(1)
+    game.move_cube(coords, string)
 
-    # Просто выполняем команду
-    try:
-        all_commands[command](value)
-    except KeyError:
-        raise ValueError(f"Неизвестная команда: {command}")
-
+    # Просто выполняем команду без всяких заморочек
+    all_commands[command](value)
     return command_ind
 
 
-def run_code(code: list[str]):
+def run_code(code: list[str], game): # передаем экземпляр доски чтобы рисовать квадратики
     """Выполняем предоставленный код"""
     # Выполняем команды по 1 строчке
     # Этот указатель будем гонять туда-сюда по всему коду
@@ -221,5 +207,5 @@ def run_code(code: list[str]):
 
     while command_ind < len(code):
         # Выполняем команду и Двигаемся дальше
-        command_ind = iter_command(code, command_ind)
+        command_ind = iter_command(code, command_ind, game)
         command_ind += 1
