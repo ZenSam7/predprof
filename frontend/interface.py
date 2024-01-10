@@ -7,10 +7,10 @@ from frontend.ui import Ui_MainWindow
 from backend.reformat import *
 
 
-class my_window(QtWidgets.QMainWindow):
-    def __init__(self):
-        """инициализация окна"""
-        super(my_window, self).__init__()
+class My_Window(QtWidgets.QMainWindow):
+    def __init__(self, start_file_path: str = ""):
+        """Инициализация окна"""
+        super(My_Window, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -18,9 +18,7 @@ class my_window(QtWidgets.QMainWindow):
         self.game_y = 30
         self.game_size = 21 * 34
 
-        file = "code"
-
-        with open(f"{file}.txt", 'r', encoding='utf-8') as f:
+        with open(start_file_path, "r", encoding="utf-16") as f:
             self.ui.textEdit.setText(f.read())
 
         self.game = Game()
@@ -51,10 +49,8 @@ class my_window(QtWidgets.QMainWindow):
 def begin_app():
     """запуск окна"""
     app = QtWidgets.QApplication([])
-    application = my_window()
+    application = My_Window("./txt_saves/code.txt")
     application.setFixedSize(1360, 780)
     application.show()
 
     sys.exit(app.exec())
-
-begin_app()
