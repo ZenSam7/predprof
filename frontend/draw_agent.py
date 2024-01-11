@@ -3,14 +3,14 @@ import pygame
 class Game():
     def __init__(self):
         self.cell_size = 34
-        self.speed_move_cube = 5000  # Условные единицы
+        self.speed_move_cube = 3000  # Условные единицы
         self.old_coords = (0.1, 0)
         pygame.display.init()
         self.wind = pygame.display.set_mode((21 * self.cell_size, 21 * self.cell_size), pygame.HIDDEN)
 
         self.move_cube((0, 0))
 
-    def move_cube(self, coords: list[int, int]):
+    def move_cube(self, coords: list[int, int], print_comand: str = None):
         """Двигаем Исполнителя постепенно"""
         self.wind.fill((40, 50, 60))
 
@@ -22,7 +22,7 @@ class Game():
                                  (x * self.cell_size, y * self.cell_size, self.cell_size + 1, self.cell_size + 1),
                                  1)
 
-        # Вспомогатеольные переменные
+        # Вспомогательные переменные
         delay_between_frame = self.cell_size / self.speed_move_cube
         pixel_size = 1 / self.cell_size
         x, y = self.old_coords

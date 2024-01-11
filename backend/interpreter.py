@@ -108,7 +108,7 @@ def call(name_proc: str):
         raise ValueError(f"Неизвестное название процедуры: {name_proc}")
 
     # Код процедуры выполняем отдельно
-    run_code(procedure_code)
+    run_code(procedure_code, game)
 
 
 # Сюда записываем все команды в формате: ["имя_команды": функция]
@@ -147,7 +147,7 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
     # Если у нас команда, которая принимает целый блок кода, то с ними поступаем иначе
     if command == "IFBLOCK":
         """Если у нас IFBLOCK вернул False, то пропускаем команды до ENDIF
-           Если он вернул True, то просто прожолжаем выполнять команды"""
+           Если он вернул True, то просто продолжаем выполнять команды"""
 
         if not all_commands[command](value):
             skip = command_ind
@@ -169,7 +169,7 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
         for N in range(value):
             index = startrepeat_index
             while index < endrepeat_index:
-                index = iter_command(code, index)
+                index = iter_command(code, index, game)
                 index += 1
 
         return endrepeat_index
@@ -183,15 +183,19 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
             procedure_code.append(code[command_ind])
 
         # Записываем код для соответствующей процедуры
-        procedures[value] = procedure_code
+        # (если она не была объявлена раньше)
+        if value not in procedures:
+            procedures[value] = procedure_code
+        else:
+            raise Exception(f"Процедура {value} уже объявлена")
         return command_ind
 
     elif command in ("LEFT", "RIGHT", "UP", "DOWN"):
-        # Проверяем правильность value для команд right/left/up/down и repeat
+        # Проверяем правильность value для команд right/left/up/down
         value = __check_available_value(value)
 
     # Рисуем нашего агента
-    print(1)
+    print([coords, string])
     game.move_cube(coords, string)
 
     # Просто выполняем команду без всяких заморочек
@@ -199,11 +203,15 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
     return command_ind
 
 
-def run_code(code: list[str], game): # передаем экземпляр доски чтобы рисовать квадратики
-    """Выполняем предоставленный код"""
+def run_code(code: list[str], Game):
+    """Выполняем предоставленный код
+    (передаем экземпляр доски чтобы рисовать квадратики)"""
     # Выполняем команды по 1 строчке
     # Этот указатель будем гонять туда-сюда по всему коду
     command_ind: int = 0
+
+    global game
+    game = Game
 
     while command_ind < len(code):
         # Выполняем команду и Двигаемся дальше

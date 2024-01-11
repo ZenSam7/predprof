@@ -38,7 +38,7 @@ class My_Window(QtWidgets.QMainWindow):
             self.ui.textEdit_2.setText(e)
 
     def paintEvent(self, e):
-        """функция рисования"""
+        """Функция рисования"""
         if self.game:
             buf = self.game.wind.get_buffer()
             img = QImage(buf, self.game_size, self.game_size, QImage.Format_RGB32)
@@ -47,7 +47,7 @@ class My_Window(QtWidgets.QMainWindow):
 
 
 def begin_app():
-    """запуск окна"""
+    """Запуск окна"""
     app = QtWidgets.QApplication([])
     application = My_Window("./txt_saves/code.txt")
     application.setFixedSize(1360, 780)

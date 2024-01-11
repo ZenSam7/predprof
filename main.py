@@ -2,9 +2,15 @@ from backend.db_saver import *
 from backend.reformat import *
 from frontend.interface import *
 
-file = "code"  # Имя рабочего файла из txt_saves
+file = "user_code"  # Имя рабочего файла из txt_saves
 
-reformat_user_file_code(f"./txt_saves/{file}.txt")  # Делаем красиво
-import_from_file(f"./txt_saves/{file}.txt")  # Импортируем в бд
+# Делаем красиво
+reformat_user_file_code(f"./txt_saves/{file}.txt", "./txt_saves/code.txt")
 
-begin_app()
+# begin_app()
+
+run_code(
+    code_for_interpeter(open("./txt_saves/user_code.txt", "r", encoding="utf-16").readlines()),
+    Game()
+)
+
