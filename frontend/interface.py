@@ -7,10 +7,10 @@ from frontend.ui import Ui_MainWindow
 from backend.reformat import *
 
 
-class my_window(QtWidgets.QMainWindow):
-    def __init__(self):
-        """инициализация окна"""
-        super(my_window, self).__init__()
+class My_Window(QtWidgets.QMainWindow):
+    def __init__(self, start_file_path: str = ""):
+        """Инициализация окна"""
+        super(My_Window, self).__init__()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
@@ -18,9 +18,7 @@ class my_window(QtWidgets.QMainWindow):
         self.game_y = 30
         self.game_size = 21 * 34
 
-        file = "code"
-
-        with open(f"{file}.txt", 'r', encoding='utf-8') as f:
+        with open(start_file_path, "r", encoding="utf-16") as f:
             self.ui.textEdit.setText(f.read())
 
         self.game = Game()
@@ -42,7 +40,7 @@ class my_window(QtWidgets.QMainWindow):
         self.update(610, 30, 714, 714)
 
     def paintEvent(self, e):
-        """функция рисования"""
+        """Функция рисования"""
         if self.game:
             buf = self.game.wind.get_buffer()
             img = QImage(buf, self.game_size, self.game_size, QImage.Format_RGB32)
@@ -56,7 +54,6 @@ class my_window(QtWidgets.QMainWindow):
         self.ui.textEdit_2.setText(error_message)
 
 
-
 if __name__ == "__main__":
     import sys
 
@@ -66,3 +63,4 @@ if __name__ == "__main__":
     sys.excepthook = w.excepthook
     w.show()
     sys.exit(app.exec_())
+

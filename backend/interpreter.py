@@ -412,8 +412,6 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
         # Проверяем правильность value для команд right/left/up/down
         value = __check_available_value(value)
 
-    # Рисуем нашего агента
-    print([coords, string])
 
     # Просто выполняем команду без всяких заморочек
     all_commands[command](value)

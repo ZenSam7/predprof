@@ -6,12 +6,12 @@ def raise_error(func):
     """Декоратор для функций, работающие с файлом"""
 
     def try_run_func(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except FileNotFoundError:
-            raise FileNotFoundError("Файла не существует")
-        except Exception as err:
-            raise Exception(f"Проблемы с файлом")
+        # try:
+        return func(*args, **kwargs)
+        # except FileNotFoundError:
+        #     raise FileNotFoundError("Файла не существует")
+        # except Exception as err:
+        #     raise Exception(f"Проблемы с файлом")
 
     return try_run_func
 
@@ -31,8 +31,7 @@ def code_for_user(raw_code: list[str]) -> list[str]:
         string = string.strip()  # Обрезаем все пробелы
 
         # Убираем все "\n"
-        if string.endswith("\n"):
-            string = string[:-1]
+        string = string.replace("\n", "")
 
         # Определяем комментарии
         if string.startswith("#"):
@@ -46,10 +45,13 @@ def code_for_user(raw_code: list[str]) -> list[str]:
         # Если это не комментарий
         else:
             # Разбиваем строку на название команды и значение для этой команды
-            if string.upper().startswith("END"):
+            if string.upper() in ("ENDIF", "ENDREPEAT", "ENDPROC"):
                 command, value = string, ""
             else:
-                command, value = string.split(maxsplit=1)
+                try:
+                    command, value = string.split(maxsplit=1)
+                except Exception as err:
+                    raise Exception(f"Неизвестная команда: {string}")
 
             # Убираем лишние пробелы после команды
             value = value.replace(" ", "")
