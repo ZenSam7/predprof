@@ -1,14 +1,14 @@
 from PyQt5 import QtWidgets
+import sys
 from frontend.draw_agent import Game
 from PyQt5.QtGui import QImage, QPainter
-from PyQt5.QtCore import QTimer
 from backend.interpreter import run_code
 from frontend.ui import Ui_MainWindow
 from backend.reformat import *
 
 
 class my_window(QtWidgets.QMainWindow):
-    def __init__(self):
+    def __init__(self, file):
         """инициализация окна"""
         super(my_window, self).__init__()
         self.ui = Ui_MainWindow()
@@ -18,28 +18,24 @@ class my_window(QtWidgets.QMainWindow):
         self.game_y = 30
         self.game_size = 21 * 34
 
-        file = "code"
-
-        with open(f"{file}.txt", 'r', encoding='utf-8') as f:
+        with open(file, "r", encoding="utf-16") as f:
             self.ui.textEdit.setText(f.read())
 
         self.game = Game()
         self.update(self.game_x, self.game_y, self.game_size, self.game_size)
-        self.ui.pushButton.clicked.connect(self.start)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.pygame_loop)
-        self.timer.start(40)
+        self.ui.pushButton.clicked.connect(self.start)
 
     def start(self):
         """старт кода, не работает"""
         code = self.ui.textEdit.toPlainText().split("\n")
 
-        # self.ui.reformat_text(my_window, code_for_user(code))
-        run_code(code_for_interpeter(code), self.game)
-
-    def pygame_loop(self):
-        self.update(610, 30, 714, 714)
+        self.ui.textEdit.setText("\n".join(code_for_user(code)))
+        try:
+            run_code(code_for_interpeter(code), self.game)
+        except Exception as e:
+            print(e)
+            self.ui.textEdit_2.setText(e)
 
     def paintEvent(self, e):
         """функция рисования"""
@@ -49,20 +45,10 @@ class my_window(QtWidgets.QMainWindow):
             p = QPainter(self)
             p.drawImage(self.game_x, self.game_y, img)
 
-    def excepthook(self, exc_type, exc_value, exc_traceback):
-        # Выполните здесь ваш код обработки исключений
-        # Например, отобразите диалоговое окно с информацией об ошибке
-        error_message = f"{exc_type.__name__}: {exc_value}"
-        self.ui.textEdit_2.setText(error_message)
 
-
-
-if __name__ == "__main__":
-    import sys
-
-
-    app = QtWidgets.QApplication(sys.argv)
-    w = my_window()
-    sys.excepthook = w.excepthook
-    w.show()
-    sys.exit(app.exec_())
+def begin_app():
+    """Запуск окна"""
+    app = QtWidgets.QApplication([])
+    application = my_window("./txt_saves/code.txt")
+    application.setFixedSize(1360, 780)
+    application.show()

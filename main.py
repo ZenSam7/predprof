@@ -1,23 +1,19 @@
 from backend.db_saver import *
 from backend.reformat import *
-from frontend.interface import my_window
+from frontend.interface import *
 from PyQt5 import QtWidgets
 import sys
+# Для меня: Когда надо конвертировать этот проект в программу,
+# то ВЕЗДЕ в пути к папке сохранений надо написать ./_internal/txt_saves
 
-# НЕ РАБОТАЕТ!!!!!
+file = "code"  # Имя рабочего файла из txt_save
 
-file = "code"  # Имя рабочего файла из txt_saves
+# Делаем красиво
+reformat_user_file_code(f"./txt_saves/{file}.txt", "./txt_saves/code.txt")
 
-reformat_user_file_code(f"./txt_saves/{file}.txt")  # Делаем красиво
-import_from_file(f"./txt_saves/{file}.txt")  # Импортируем в бд
+begin_app()
 
-app = QtWidgets.QApplication([])
-application = my_window()
-application.setFixedSize(1360, 780)
-application.show()
-
-sys.exit(app.exec())
-
-# НЕ РАБОТАЕТ!!!!!
-
-
+run_code(
+    code_for_interpeter(open("./txt_saves/user_code.txt", "r", encoding="utf-16").readlines()),
+    Game()
+)
