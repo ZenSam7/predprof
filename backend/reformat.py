@@ -24,14 +24,14 @@ def code_for_user(raw_code: list[str]) -> list[str]:
 
     # Форматируем каждую строку
     for index, string in enumerate(raw_code):
-        if string == "\n":
-            code.append("\n")
-            continue
-
         string = string.strip()  # Обрезаем все пробелы
 
         # Убираем все "\n"
         string = string.replace("\n", "")
+
+        if string == "":
+            code.append("\n")
+            continue
 
         # Определяем комментарии
         if string.startswith("#"):
