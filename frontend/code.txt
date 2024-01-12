@@ -18,7 +18,7 @@ ENDPROC
 SET X=10
 SET x=X
 
-
+жнрпиж
 CALL RightDown
 
 
@@ -36,4 +36,7 @@ ENDPROC
 
 REPEAT amount_cycle
     CALL cycle
-ENDREPEAT 
+ENDREPEAT
+
+SUBSKRIBE TO COCK DEPARTAMENT
+

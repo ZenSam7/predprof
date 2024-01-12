@@ -1,16 +1,23 @@
 from backend.db_saver import *
 from backend.reformat import *
-from frontend.interface import *
+from frontend.interface import my_window
+from PyQt5 import QtWidgets
+import sys
 
-file = "user_code"  # Имя рабочего файла из txt_saves
+# НЕ РАБОТАЕТ!!!!!
 
-# Делаем красиво
-reformat_user_file_code(f"./txt_saves/{file}.txt", "./txt_saves/code.txt")
+file = "code"  # Имя рабочего файла из txt_saves
 
-# begin_app()
+reformat_user_file_code(f"./txt_saves/{file}.txt")  # Делаем красиво
+import_from_file(f"./txt_saves/{file}.txt")  # Импортируем в бд
 
-run_code(
-    code_for_interpeter(open("./txt_saves/user_code.txt", "r", encoding="utf-16").readlines()),
-    Game()
-)
+app = QtWidgets.QApplication([])
+application = my_window()
+application.setFixedSize(1360, 780)
+application.show()
+
+sys.exit(app.exec())
+
+# НЕ РАБОТАЕТ!!!!!
+
 

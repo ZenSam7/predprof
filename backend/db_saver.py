@@ -1,6 +1,6 @@
 import os
 import sqlite3
-from .reformat import code_for_interpeter, raise_error
+from .reformat import code_for_interpeter
 
 
 def _do_request(request: str):
@@ -9,10 +9,6 @@ def _do_request(request: str):
     try:
         conn = sqlite3.connect("saves.db")
         cur = conn.cursor()
-
-        # Добавляем ";"
-        if not request.endswith(";"):
-            request += ";"
 
         # Выполняем запрос
         cur.execute(request)
@@ -61,29 +57,18 @@ def db_delete(name: str):
 
 def create_new_table():
     """Создаём новую таблицу (зачем?)"""
-    _do_request(
-        "create table if not exists saves (name text not null, code longtext);"
-    )
+    _do_request("create table if not exists saves (name text not null, code list text);")
 
 
-@raise_error
 def export_to_txt(name: str):
     """Экспортируем сохранение из бд в дайл"""
-    # Убираем формат
-    name = name.split(".")[0] if "." in name else name
-
-    # Если файл уже есть, то заменяем
-    if (name + ".txt") in os.listdir("./txt_saves"):
-        os.remove(f"txt_saves/{name}.txt")
-
-    with open(f"txt_saves/{name}.txt", "w+", encoding="utf-16") as file:
+    with open(f"txt_saves/{name}.txt", "w+") as file:
         file.write(db_load(name))
 
 
-@raise_error
 def import_from_file(file_path: str):
     """Импортируем сохранение в бд из файла"""
-    with open(file_path, "r", encoding="utf-16") as file:
+    with open(file_path, "r") as file:
         code = "".join(file.readlines())
 
     # Има сохранения == название файла
