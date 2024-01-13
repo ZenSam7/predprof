@@ -11,7 +11,7 @@ class Game():
 
         self.move_cube((0, 0))
 
-    def move_cube(self, coords: list[int, int], print_comand: str = None):
+    def move_cube(self, coords: list[int, int], command: str = None):
         """Двигаем Исполнителя"""
         self.wind.fill((40, 50, 60))
 
@@ -36,6 +36,7 @@ class Game():
         )
 
         # Выводим команду
+        # pygame.font.init()
         # font = pygame.font.Font(None, 40)  # Какой шрифт и размер надписи
         # text_SCORE = font.render(command, True, (220, 220, 220))
         # self.wind.blit(text_SCORE, (0, 0))

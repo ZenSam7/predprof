@@ -51,7 +51,7 @@ def code_for_user(raw_code: list[str]) -> list[str]:
                 try:
                     command, value = string.split(maxsplit=1)
                 except Exception as err:
-                    raise Exception(f"Неизвестная команда: {string}")
+                    raise NameError(f"Неизвестная команда: {string}")
 
             # Убираем лишние пробелы после команды
             value = value.replace(" ", "")
@@ -72,7 +72,7 @@ def code_for_user(raw_code: list[str]) -> list[str]:
 
             # Обрабатываем асимальное количество вложенных конструкций
             if amount_indent == 4:
-                raise Exception(
+                raise RecursionError(
                     f"Достугнуто максимальное количство "
                     f"вложенных команд: 3 в строке {index + 1 + 1}"
                 )
@@ -104,10 +104,7 @@ def code_for_user(raw_code: list[str]) -> list[str]:
 
     # Если для последней строки есть отступ, то мы что-то написани не так
     if amount_indent != 0:
-        raise Exception(
-            "Ошибка в коде! Проверьте правильность написания команд и "
-            "наличие всех ENDREPEAT, ENDIF и EDPROC"
-        )
+        raise Exception("Ошибка в коде! Проверьте наличие всех ENDREPEAT, ENDIF и EDPROC")
 
     return code
 

@@ -32,7 +32,7 @@ def __check_available_value(value: [str | int]):
         try:
             value = vars[value]
         except KeyError:
-            raise ValueError(f"Неизвестная переменная: {value}")
+            raise NameError(f"Неизвестная переменная: {value}")
 
     # Если value это что-то другое, то вызываем ошибку
     else:
@@ -52,7 +52,7 @@ def __check_offscreen():
         raise ValueError(f"Выход за пределы экрана! Координаты: {coords}")
 
 
-def pass_func(*args):
+def pass_func(*args, **kwargs):
     """Ничего не делаем"""
     return
 
@@ -119,6 +119,9 @@ def set(variable_and_value: str):
 
     name_var, value = variable_and_value.split("=")
 
+    if name_var[0].isdigit():
+        raise NameError(f"Недопустимое имя переменной: {name_var}")
+
     value = __check_available_value(value)
 
     vars[name_var] = value
@@ -152,14 +155,16 @@ all_commands = {"IFBLOCK": ifblock,
 # Инициализируем переменные для интерпретатора
 coords = [0, 0]  # Начало координат: слева сверху
 
-vars = {}  # Все переменные тут
-procedures = {}  # Все процедуры тут
+vars: dict[str, int] = {}  # Все переменные тут
+procedures: dict[str, list[str]] = {}  # Все процедуры тут
+
+route: list[[int, int]] = [[0, 0]]  # Список всех прошлых координат
 
 
 def iter_command(code: list[str], command_ind: int, game) -> int:
     """Интепретируем (выполняем) команду и возвращаем индекс
      команды на котором остановились"""
-    global procedures
+    global procedures, route, coords
     string = code[command_ind]
 
     # Разбиваем команду на название команды и значение этой команды
@@ -207,19 +212,26 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
             procedure_code.append(code[command_ind])
 
         # Записываем код для соответствующей процедуры
-        # (если она не была объявлена раньше)
-        if value not in procedures:
-            procedures[value] = procedure_code
+        # (если она не была объявлена раньше, и имя процедуры корректно)
+        if value in procedures:
+            raise NameError(f"Процедура {value} уже объявлена")
+        elif value[0].isdigit():
+            raise NameError(f"Некорректное имя процедуры: {value}")
         else:
-            raise Exception(f"Процедура {value} уже объявлена")
+            procedures[value] = procedure_code
+
         return command_ind
 
     elif command in ("LEFT", "RIGHT", "UP", "DOWN"):
         # Проверяем правильность value для команд right/left/up/down
         value = __check_available_value(value)
 
-    # Рисуем нашего агента
+    # Двигаем Исполнителя
     game.move_cube(coords, string)
+
+    # Добавляем координаты в маршрут
+    if coords.copy() != route[-1]:
+        route.append(coords.copy())
 
     # Просто выполняем команду без всяких заморочек
     all_commands[command](value)
