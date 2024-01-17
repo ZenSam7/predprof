@@ -226,15 +226,16 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
         # Проверяем правильность value для команд right/left/up/down
         value = __check_available_value(value)
 
-    # Двигаем Исполнителя
-    game.move_cube(coords, string)
-
     # Добавляем координаты в маршрут
     if coords.copy() != route[-1]:
         route.append(coords.copy())
 
     # Просто выполняем команду без всяких заморочек
     all_commands[command](value)
+
+    # Двигаем Исполнителя (сначала ходим, потом отрисовываем)
+    game.move_cube(coords, string)
+    
     return command_ind
 
 

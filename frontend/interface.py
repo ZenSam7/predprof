@@ -27,15 +27,17 @@ class my_window(QtWidgets.QMainWindow):
         self.update(self.game_x, self.game_y, self.game_size, self.game_size)
 
         # При нажатии на кнопку запускаем код
-        code = code_for_interpeter(open(file, "r", encoding="utf-16").readlines())
-        self.ui.pushButton.clicked.connect(
-            lambda: run_code(code_for_interpeter(code), self.game)
-        )
+        self.ui.pushButton.clicked.connect(self.start_code)
 
-        # Что оно делает?
+        # Отрисовка таблицы
         self.timer = QTimer()
         self.timer.timeout.connect(self.pygame_loop)
-        self.timer.start(1)
+        self.timer.start(40)
+
+    def start_code(self):
+        code = self.ui.textEdit.toPlainText().split('\n')
+        print(code)
+        run_code(code_for_interpeter(code), self.game)
 
     def pygame_loop(self):
         self.update(610, 30, 714, 714)
