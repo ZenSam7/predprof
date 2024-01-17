@@ -49,7 +49,7 @@ def __check_offscreen():
     """Проверяем, вышел ли агент за экран"""
     global coords
     if not (0 <= coords[0] <= 20 and 0 <= coords[1] <= 20):
-        raise ValueError(f"Выход за пределы экрана! Координаты: {coords}")
+        raise ValueError(f"Выход за пределы экрана! Координаты: {[coords[0] +1, coords[1] +1]}")
 
 
 def pass_func(*args, **kwargs):
@@ -63,11 +63,12 @@ def right(value: [str | int]):
     distance = __check_available_value(value)
     coords[0] += distance
 
-    # Если вышли за предела, то упираемся в стенку
+    # Если вышли за пределы, то упираемся в стенку
     try:
         __check_offscreen()
     except ValueError as err:
         coords[0] = 20
+        game.move_cube(coords)
         raise err
 
 
@@ -77,7 +78,7 @@ def left(value: [str | int]):
     distance = __check_available_value(value)
     coords[0] -= distance
 
-    # Если вышли за предела, то упираемся в стенку
+    # Если вышли за пределы, то упираемся в стенку
     try:
         __check_offscreen()
     except ValueError as err:
@@ -91,7 +92,7 @@ def up(value: [str | int]):
     distance = __check_available_value(value)
     coords[1] -= distance
 
-    # Если вышли за предела, то упираемся в стенку
+    # Если вышли за пределы, то упираемся в стенку
     try:
         __check_offscreen()
     except ValueError as err:
@@ -105,7 +106,7 @@ def down(value: [str | int]):
     distance = __check_available_value(value)
     coords[1] += distance
 
-    # Если вышли за предела, то упираемся в стенку
+    # Если вышли за пределы, то упираемся в стенку
     try:
         __check_offscreen()
     except ValueError as err:
@@ -235,7 +236,7 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
 
     # Двигаем Исполнителя (сначала ходим, потом отрисовываем)
     game.move_cube(coords, string)
-    
+
     return command_ind
 
 

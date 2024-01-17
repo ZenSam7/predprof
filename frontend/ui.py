@@ -34,6 +34,16 @@ class Ui_MainWindow(object):
         self.textEdit_2.setGeometry(QtCore.QRect(0, 0, 550, 200))
         self.textEdit_2.setReadOnly(True)
         self.textEdit_2.setObjectName("textEdit_2")
+        self.textEdit.setStyleSheet('''
+                    QTextEdit {
+                        font: 14pt "Consolas";
+                    }
+                ''')
+        self.textEdit_2.setStyleSheet('''
+                            QTextEdit {
+                                font: 14pt "Consolas";
+                            }
+                        ''')
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)

@@ -38,6 +38,7 @@ class my_window(QtWidgets.QMainWindow):
         code = self.ui.textEdit.toPlainText().split('\n')
         print(code)
         run_code(code_for_interpeter(code), self.game)
+        self.ui.textEdit_2.setText('all is good')
 
     def pygame_loop(self):
         self.update(610, 30, 714, 714)
