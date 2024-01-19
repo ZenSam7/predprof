@@ -59,7 +59,7 @@ def pass_func(*args, **kwargs):
 
 def right(value: [str | int]):
     """Перемещаем вправо (принимает переменную или число)"""
-    global coords
+    global coords, route
     distance = __check_available_value(value)
     coords[0] += distance
 
@@ -68,13 +68,13 @@ def right(value: [str | int]):
         __check_offscreen()
     except ValueError as err:
         coords[0] = 20
-        game.move_cube(coords)
+        route.append(coords)
         raise err
 
 
 def left(value: [str | int]):
     """Перемещаем влево (принимает переменную или число)"""
-    global coords
+    global coords, route
     distance = __check_available_value(value)
     coords[0] -= distance
 
@@ -83,12 +83,13 @@ def left(value: [str | int]):
         __check_offscreen()
     except ValueError as err:
         coords[0] = 0
+        route.append(coords)
         raise err
 
 
 def up(value: [str | int]):
     """Перемещаем вверх (принимает переменную или число)"""
-    global coords
+    global coords, route
     distance = __check_available_value(value)
     coords[1] -= distance
 
@@ -97,12 +98,13 @@ def up(value: [str | int]):
         __check_offscreen()
     except ValueError as err:
         coords[1] = 0
+        route.append(coords)
         raise err
 
 
 def down(value: [str | int]):
     """Перемещаем вниз (принимает переменную или число)"""
-    global coords
+    global coords, route
     distance = __check_available_value(value)
     coords[1] += distance
 
@@ -111,6 +113,7 @@ def down(value: [str | int]):
         __check_offscreen()
     except ValueError as err:
         coords[1] = 20
+        route.append(coords)
         raise err
 
 
@@ -156,10 +159,10 @@ all_commands = {"IFBLOCK": ifblock,
 # Инициализируем переменные для интерпретатора
 coords = [0, 0]  # Начало координат: слева сверху
 
-vars: dict[str, int] = {}  # Все переменные тут
-procedures: dict[str, list[str]] = {}  # Все процедуры тут
+vars: dict[int] = {}  # Все переменные тут
+procedures: dict[list[str]] = {}  # Все процедуры тут
 
-route: list[[int, int]] = [[0, 0]]  # Список всех прошлых координат
+route: list[list[int, int]] = [[0, 0]]  # Список всех прошлых координат
 
 
 def iter_command(code: list[str], command_ind: int, game) -> int:
@@ -227,15 +230,12 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
         # Проверяем правильность value для команд right/left/up/down
         value = __check_available_value(value)
 
-    # Добавляем координаты в маршрут
-    if coords.copy() != route[-1]:
-        route.append(coords.copy())
-
     # Просто выполняем команду без всяких заморочек
     all_commands[command](value)
 
-    # Двигаем Исполнителя (сначала ходим, потом отрисовываем)
-    game.move_cube(coords, string)
+    # Добавляем координаты в маршрут
+    if len(route) == 0 or coords.copy() != route[-1]:
+        route.append(coords.copy())
 
     return command_ind
 
@@ -243,15 +243,21 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
 def run_code(code: list[str], Game):
     """Выполняем предоставленный код
     (передаем экземпляр доски чтобы рисовать квадратики)"""
+    global route
     # Выполняем команды по 1 строчке
     # Этот указатель будем гонять туда-сюда по всему коду
     command_ind: int = 0
 
-    # Это надо чтобы работала фнкция call (в ней нельзя передать game)
+    # Это надо чтобы работала фнкция call
     global game
     game = Game
 
     while command_ind < len(code):
         # Выполняем команду и Двигаемся дальше
-        command_ind = iter_command(code, command_ind, game)
-        command_ind += 1
+        try:
+            command_ind = iter_command(code, command_ind, game)
+            command_ind += 1
+        except Exception as err:
+            return route, err
+
+    return route, None
