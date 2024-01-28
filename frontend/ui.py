@@ -20,9 +20,19 @@ class Ui_MainWindow(object):
         self.textEdit.setAutoFormatting(QtWidgets.QTextEdit.AutoAll)
         self.textEdit.setObjectName("textEdit")
         self.scrollArea.setWidget(self.scrollAreaWidgetContents)
-        self.pushButton = QtWidgets.QPushButton(self.centralwidget)
-        self.pushButton.setGeometry(QtCore.QRect(30, 465, 151, 70))
-        self.pushButton.setObjectName("pushButton")
+        self.button_start = QtWidgets.QPushButton(self.centralwidget)
+        self.button_start.setGeometry(QtCore.QRect(25, 465, 100, 70))
+        self.button_start.setObjectName("button_start")
+        self.button_start_with_reset = QtWidgets.QPushButton(self.centralwidget)
+        btn_wight, indent = 120, 30
+        self.button_start_with_reset.setGeometry(QtCore.QRect(btn_wight + indent, 465, btn_wight, 70))
+        self.button_start_with_reset.setObjectName("button_start_with_reset")
+        self.button_stop = QtWidgets.QPushButton(self.centralwidget)
+        self.button_stop.setGeometry(QtCore.QRect(2*btn_wight + 2*indent, 465, btn_wight, 70))
+        self.button_stop.setObjectName("button_stop")
+        self.button_reformat = QtWidgets.QPushButton(self.centralwidget)
+        self.button_reformat.setGeometry(QtCore.QRect(3*btn_wight + 3*indent, 465, btn_wight, 70))
+        self.button_reformat.setObjectName("button_reformat")
         self.scrollArea_2 = QtWidgets.QScrollArea(self.centralwidget)
         self.scrollArea_2.setGeometry(QtCore.QRect(30, 550, 550, 200))
         self.scrollArea_2.setWidgetResizable(True)
@@ -75,7 +85,10 @@ class Ui_MainWindow(object):
 "p, li { white-space: pre-wrap; }\n"
 "</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:12pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:12pt;\">fdfsd</span></p></body></html>"))
-        self.pushButton.setText(_translate("MainWindow", "START"))
+        self.button_start.setText(_translate("MainWindow", "СТАРТ"))
+        self.button_start_with_reset.setText(_translate("MainWindow", "СТАРТ СО\nСБРОСОМ"))
+        self.button_stop.setText(_translate("MainWindow", "СТОП"))
+        self.button_reformat.setText(_translate("MainWindow", "ФОРМАТИРОВАТЬ\nКОД"))
         self.textEdit_2.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"

@@ -139,7 +139,7 @@ def call(name_proc: str):
         raise ValueError(f"Неизвестное название процедуры: {name_proc}")
 
     # Код процедуры выполняем отдельно
-    run_code(procedure_code, game)
+    run_code(procedure_code)
 
 
 # Сюда записываем все команды в формате: ["имя_команды": функция]
@@ -165,7 +165,7 @@ procedures: dict[list[str]] = {}  # Все процедуры тут
 route: list[list[int, int]] = [[0, 0]]  # Список всех прошлых координат
 
 
-def iter_command(code: list[str], command_ind: int, game) -> int:
+def iter_command(code: list[str], command_ind: int) -> int:
     """Интепретируем (выполняем) команду и возвращаем индекс
      команды на котором остановились"""
     global procedures, route, coords
@@ -202,7 +202,7 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
         for N in range(value):
             index = startrepeat_index
             while index < endrepeat_index:
-                index = iter_command(code, index, game)
+                index = iter_command(code, index)
                 index += 1
 
         return endrepeat_index
@@ -240,7 +240,7 @@ def iter_command(code: list[str], command_ind: int, game) -> int:
     return command_ind
 
 
-def run_code(code: list[str], Game):
+def run_code(code: list[str]):
     """Выполняем предоставленный код
     (передаем экземпляр доски чтобы рисовать квадратики)"""
     global route
@@ -248,14 +248,10 @@ def run_code(code: list[str], Game):
     # Этот указатель будем гонять туда-сюда по всему коду
     command_ind: int = 0
 
-    # Это надо чтобы работала фнкция call
-    global game
-    game = Game
-
     while command_ind < len(code):
         # Выполняем команду и Двигаемся дальше
         try:
-            command_ind = iter_command(code, command_ind, game)
+            command_ind = iter_command(code, command_ind)
             command_ind += 1
         except Exception as err:
             return route, err

@@ -15,7 +15,7 @@ class Game():
         self.coords = [0, 0]
 
         # Сколько секунд ждём между движением по клетке
-        self.agent_speed = 0.05
+        self.agent_speed = 0.06
 
         self.move_cube((0, 0))
 

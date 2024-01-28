@@ -5,6 +5,14 @@ from frontend.ui import Ui_MainWindow
 from PyQt5 import QtWidgets
 from PyQt5.QtGui import QImage, QPainter
 from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import (
+    QApplication,
+    QMenu,
+    QPushButton,
+    QVBoxLayout,
+    QWidget,
+    QFileDialog
+)
 from time import time
 import asyncio
 
@@ -31,13 +39,71 @@ class my_window(QtWidgets.QMainWindow):
         self.game = Game()
         self.update(self.game_x, self.game_y, self.game_size, self.game_size)
 
-        # При нажатии на кнопку запускаем код
-        self.ui.pushButton.clicked.connect(self.start_code)
+        # При нажатии на кнопку запускаем или форматируем код
+        self.ui.button_start.clicked.connect(self.start_code)
+        self.ui.button_start_with_reset.clicked.connect(self.start_code_with_reset)
+        self.ui.button_stop.clicked.connect(self.stop_code)
+        self.ui.button_reformat.clicked.connect(self.format_code)
+
+        # Всплывашка для "Файл"
+        self.menu_file = QtWidgets.QMenu(self)
+        self.menu_file.addAction("Открыть файл", self.open_file)
+        self.menu_file.addAction("Сохранить как txt", self.save_as_txt)
+        self.menu_file.addAction("Загрузить")
+
+        self.btn_file = QtWidgets.QPushButton(text="Файл", parent=self)
+        self.btn_file.setMenu(self.menu_file)
+        self.btn_file.setFixedSize(100, 30)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.btn_file)
+        self.setLayout(layout)
 
         # Отрисовка таблицы
         self.timer = QTimer()
         self.timer.timeout.connect(self.pygame_loop)
         self.timer.start(1)
+
+    def format_code(self):
+        """Форматируем код в редакторе кода"""
+        raw_code = self.ui.textEdit.toPlainText().split("\n")
+        norm_code = code_for_user(raw_code)
+        print(norm_code)
+        self.ui.textEdit.setText("".join(norm_code))
+
+    def open_file(self):
+        """Открываем сохранение через диалоговое окно"""
+        file_path, _ = QFileDialog.getOpenFileName(self, "Открыть файл", "", "")
+        if file_path:
+            with open(file_path, "r", encoding="utf-16") as file:
+                self.ui.textEdit.setText(file.read())
+
+    def stop_code(self):
+        """Останавливаем код"""
+        self.game.should_here = self.game.coords
+        self.route = []
+
+    def save_as_txt(self):
+        """Сохраняем сохранение через диалоговое окно"""
+        file_path, _ = QFileDialog.getSaveFileName(self, "Сохранить файл",
+                                                   "", "Текстовые файлы (*.txt)")
+        if file_path:
+            with open(file_path, "w+", encoding="utf-16") as file:
+                print(self.ui.textEdit.toPlainText())
+                file.write(self.ui.textEdit.toPlainText())
+
+    def start_code_with_reset(self):
+        """Та же кнопка запуска кода, но сбрасываем все переменные и процедуры"""
+        import backend.interpreter as i
+        i.vars.clear()
+        i.procedures.clear()
+        i.route = [[0, 0]]
+        self.route = [[0, 0]]
+        i.coords = [0, 0]
+        self.game.coords = [0, 0]
+        self.game.should_here = [0, 0]
+        self.game.move_cube((0, 0))
+        self.start_code()
 
     def start_code(self):
         code = self.ui.textEdit.toPlainText().split('\n')
@@ -45,7 +111,7 @@ class my_window(QtWidgets.QMainWindow):
 
         # В route записываем последовательность координат по которым надо пройтись,
         # и потом рисуем агента в paintEvent по 1 клетке
-        self.route, err = run_code(code_for_interpeter(code), [[0, 0]])
+        self.route, err = run_code(code_for_interpeter(code))
         self.ui.textEdit_2.setText('all is good')
 
         if err is not None:
