@@ -1,5 +1,7 @@
+import os
 from backend.interpreter import run_code
 from backend.reformat import *
+from backend.db_saver import *
 from frontend.draw_agent import Game
 from frontend.ui import Ui_MainWindow
 from PyQt5 import QtWidgets
@@ -38,6 +40,7 @@ class my_window(QtWidgets.QMainWindow):
 
         self.game = Game()
         self.update(self.game_x, self.game_y, self.game_size, self.game_size)
+        self.file_path = ""  # Заголовок текущего файла
 
         # При нажатии на кнопку запускаем или форматируем код
         self.ui.button_start.clicked.connect(self.start_code)
@@ -45,24 +48,31 @@ class my_window(QtWidgets.QMainWindow):
         self.ui.button_stop.clicked.connect(self.stop_code)
         self.ui.button_reformat.clicked.connect(self.format_code)
 
-        # Всплывашка для "Файл"
-        self.menu_file = QtWidgets.QMenu(self)
-        self.menu_file.addAction("Открыть файл", self.open_file)
-        self.menu_file.addAction("Сохранить как txt", self.save_as_txt)
-        self.menu_file.addAction("Загрузить")
-
-        self.btn_file = QtWidgets.QPushButton(text="Файл", parent=self)
-        self.btn_file.setMenu(self.menu_file)
-        self.btn_file.setFixedSize(100, 30)
-
-        layout = QVBoxLayout()
-        layout.addWidget(self.btn_file)
-        self.setLayout(layout)
+        # Нуждается в подключении функционала
+        self.ui.actionOpen_txt.triggered.connect(self.open_file)
+        self.ui.actionSave.triggered.connect(self.save)
+        self.ui.actionSave_as_txt.triggered.connect(self.save_as_txt)
+        # self.ui.actionExport_as_txt.triggered.connect(self.export_as_txt)
+        # self.ui.actionImport_file.triggered.connect(self.import_file)
+        self.ui.actionImport_db.triggered.connect(self.import_db)
+        self.ui.actionExport.triggered.connect(self.export)
 
         # Отрисовка таблицы
         self.timer = QTimer()
         self.timer.timeout.connect(self.pygame_loop)
         self.timer.start(1)
+
+    def export(self):
+        # Надо сделать всплывашку всплывашки
+        pass
+
+    def import_db(self):
+        # Если мы открыли или уже ранее сохраняли файлы, то не парим пользователя
+        if self.file_path:
+            import_from_file(self.file_path)
+        else:
+            self.open_file()
+            import_from_file(self.file_path)
 
     def format_code(self):
         """Форматируем код в редакторе кода"""
@@ -77,11 +87,22 @@ class my_window(QtWidgets.QMainWindow):
         if file_path:
             with open(file_path, "r", encoding="utf-16") as file:
                 self.ui.textEdit.setText(file.read())
+                self.file_path = file_path
 
     def stop_code(self):
         """Останавливаем код"""
         self.game.should_here = self.game.coords
         self.route = []
+
+    def save(self):
+        """Сохраняем сохранение"""
+        # Если мы открыли или уже ранее сохраняли файлы, то не парим пользователя
+        if self.file_path:
+            os.remove(self.file_path)
+            with open(self.file_path, "w+", encoding="utf-16") as file:
+                file.write(self.ui.textEdit.toPlainText())
+        else:
+            self.save_as_txt()
 
     def save_as_txt(self):
         """Сохраняем сохранение через диалоговое окно"""
@@ -89,8 +110,8 @@ class my_window(QtWidgets.QMainWindow):
                                                    "", "Текстовые файлы (*.txt)")
         if file_path:
             with open(file_path, "w+", encoding="utf-16") as file:
-                print(self.ui.textEdit.toPlainText())
                 file.write(self.ui.textEdit.toPlainText())
+                self.file_path = file_path
 
     def start_code_with_reset(self):
         """Та же кнопка запуска кода, но сбрасываем все переменные и процедуры"""
@@ -112,7 +133,7 @@ class my_window(QtWidgets.QMainWindow):
         # В route записываем последовательность координат по которым надо пройтись,
         # и потом рисуем агента в paintEvent по 1 клетке
         self.route, err = run_code(code_for_interpeter(code))
-        self.ui.textEdit_2.setText('all is good')
+        self.ui.textEdit_2.setText("Всё хорошо")
 
         if err is not None:
             raise err

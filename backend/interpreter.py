@@ -230,8 +230,11 @@ def iter_command(code: list[str], command_ind: int) -> int:
         # Проверяем правильность value для команд right/left/up/down
         value = __check_available_value(value)
 
-    # Просто выполняем команду без всяких заморочек
-    all_commands[command](value)
+    try:
+        # Просто выполняем команду без всяких заморочек
+        all_commands[command](value)
+    except:
+        raise NameError(f"Неизвестная команда: {command}")
 
     # Добавляем координаты в маршрут
     if len(route) == 0 or coords.copy() != route[-1]:

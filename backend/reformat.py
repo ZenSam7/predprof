@@ -136,11 +136,12 @@ def code_for_interpeter(raw_code: list[str]) -> list[str]:
     code_for_interpreter = []
 
     # Записываем все не пустые строки в code, убираем: "\n", отступы и комментарии
-    for string in code_for_user(raw_code):
-        if string == "\n":
+    for string in raw_code:
+        if "\n" in string:
+            string = string.replace("\n", "")
+
+        if string == "":
             continue
-        if string.endswith("\n"):
-            string = string[:-1]
 
         string = string.strip()  # Обрезаем отступы
 
