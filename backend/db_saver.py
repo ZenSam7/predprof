@@ -31,6 +31,11 @@ def _do_request(request: str):
         return result
 
 
+def db_titles_saves() -> list[str]:
+    """Возвращаем список названий сохранений в бд"""
+    return [name[0] for name in _do_request("select name from saves ORDER BY name;")]
+
+
 def db_save(name: str, code: str):
     """Сохраняем код как новое сохранение в бд"""
     try:

@@ -40,7 +40,12 @@ class my_window(QtWidgets.QMainWindow):
 
         self.game = Game()
         self.update(self.game_x, self.game_y, self.game_size, self.game_size)
-        self.file_path = ""  # Заголовок текущего файла
+
+        # Если у нас в file_path путь, возвращаем путь
+        # Если у нас в file_path имя на сохранение в бд, возвращаем сохранение
+        def getter_fite_path(string): return db_load(string) if "/" in string else string
+        # Заголовок текущего файла
+        self.file_path = property(getter_fite_path)
 
         # При нажатии на кнопку запускаем или форматируем код
         self.ui.button_start.clicked.connect(self.start_code)
@@ -48,25 +53,50 @@ class my_window(QtWidgets.QMainWindow):
         self.ui.button_stop.clicked.connect(self.stop_code)
         self.ui.button_reformat.clicked.connect(self.format_code)
 
-        # Нуждается в подключении функционала
+        # Подключаем команды к кнопкам
         self.ui.actionOpen_txt.triggered.connect(self.open_file)
         self.ui.actionSave.triggered.connect(self.save)
         self.ui.actionSave_as_txt.triggered.connect(self.save_as_txt)
-        # self.ui.actionExport_as_txt.triggered.connect(self.export_as_txt)
-        # self.ui.actionImport_file.triggered.connect(self.import_file)
+        self.ui.actionExport_as_txt.triggered.connect(self.export_as_txt)
+        self.ui.actionImport_file.triggered.connect(self.import_file)
         self.ui.actionImport_db.triggered.connect(self.import_db)
-        self.ui.actionExport.triggered.connect(self.export)
+        self.ui.export_menu.triggered.connect(self.export_from_submenu)
 
         # Отрисовка таблицы
         self.timer = QTimer()
         self.timer.timeout.connect(self.pygame_loop)
         self.timer.start(1)
 
-    def export(self):
-        # Надо сделать всплывашку всплывашки
-        pass
+    def export_from_submenu(self):
+        """Назначаем каждому сохранению всё замыкание для загрузки в окно"""
+        self.ui.update_submenu()
+
+        for db_save_name in db_titles_saves():
+            def close_name_for_export(name: str):
+                def export_from_db(): nonlocal name; self.ui.textEdit.setText(db_load(name))
+
+                return export_from_db
+
+            self.ui.__dict__["save_for_sub_menu_" + db_save_name].triggered.connect(
+                close_name_for_export(db_save_name)
+            )
+
+    def export_as_txt(self):
+        # ))))))
+        self.save_as_txt()
 
     def import_db(self):
+        """Импортируем из окна редактирования"""
+        file_path, _ = QFileDialog.getSaveFileName(
+            self, "Сохранить файл", "", "Название файла для сохранения в бд (*.only_name)")
+
+        # Нам нужно только имя для сохранения в бд
+        save_name = file_path.split("/")[-1].split(".")[0]
+
+        # Сохраняем в бд
+        db_save(save_name, self.ui.textEdit.toPlainText())
+
+    def import_file(self):
         # Если мы открыли или уже ранее сохраняли файлы, то не парим пользователя
         if self.file_path:
             import_from_file(self.file_path)
@@ -106,8 +136,7 @@ class my_window(QtWidgets.QMainWindow):
 
     def save_as_txt(self):
         """Сохраняем сохранение через диалоговое окно"""
-        file_path, _ = QFileDialog.getSaveFileName(self, "Сохранить файл",
-                                                   "", "Текстовые файлы (*.txt)")
+        file_path, _ = QFileDialog.getSaveFileName(self, "Сохранить файл", "", "Текстовые файлы (*.txt)")
         if file_path:
             with open(file_path, "w+", encoding="utf-16") as file:
                 file.write(self.ui.textEdit.toPlainText())

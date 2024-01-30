@@ -4,7 +4,7 @@ from time import sleep
 
 class Game():
     def __init__(self):
-        self.cell_size = 34
+        self.cell_size = 34  # Не менять, а то комп взорвётся
 
         # pygame.HIDDEN т.к. выводим поле в окне через буфер дисплея (если убрать, будет новое окно)
         pygame.display.init()
@@ -14,24 +14,27 @@ class Game():
         self.should_here = [0, 0]
         self.coords = [0, 0]
 
+        # Коэффициент плавности анимаций (ДОЛЖНО БЫТЬ КРАТНО 2 (типа 1, 2 ... 16))
+        # (из-за особоностей хранения чисел с плавающей точкой)
+        self.smoothness_coefficient = 16
         # Сколько секунд ждём между движением по клетке
-        self.agent_speed = 0.06
+        self.agent_speed = 0.06 / self.smoothness_coefficient
 
         self.move_cube((0, 0))
 
     def frame_cube_animate(self, coords: list[int, int]):
         """Двигаем агента на 1 клетку до координат should_here"""
         x, y = self.coords
+        step = 1/self.smoothness_coefficient
 
         if self.should_here[0] > x:
-            x += 1
+            x += step
         elif self.should_here[0] < x:
-            x -= 1
-
+            x -= step
         if self.should_here[1] > y:
-            y += 1
+            y += step
         elif self.should_here[1] < y:
-            y -= 1
+            y -= step
 
         self.move_cube([x, y])
         self.coords = [x, y]

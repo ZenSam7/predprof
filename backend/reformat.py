@@ -6,12 +6,12 @@ def raise_error(func):
     """Декоратор для функций, работающие с файлом"""
 
     def try_run_func(*args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        except FileNotFoundError:
-            raise FileNotFoundError("Файла не существует")
-        except Exception as err:
-            raise Exception(f"Проблемы с файлом")
+        # try:
+        return func(*args, **kwargs)
+        # except FileNotFoundError:
+        #     raise FileNotFoundError("Файла не существует")
+        # except Exception as err:
+        #     raise Exception(f"Проблемы с файлом")
 
     return try_run_func
 

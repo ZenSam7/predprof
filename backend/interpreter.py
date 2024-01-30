@@ -11,7 +11,7 @@ def ifblock(dir: str):
     return possible
 
 
-def __check_available_value(value: [str | int]):
+def __check_available_value(value: [str | int], command: str = ""):
     """Проверяем чтобы значение было [1; 1000] и возвращаем это
      значение чтобы лишний раз не доставать из переменной"""
     global vars
@@ -32,24 +32,24 @@ def __check_available_value(value: [str | int]):
         try:
             value = vars[value]
         except KeyError:
-            raise NameError(f"Неизвестная переменная: {value}")
+            raise NameError(f"Неизвестная переменная: {command} {value}")
 
     # Если value это что-то другое, то вызываем ошибку
     else:
-        raise ValueError(f"Недопустимое значение: {value}")
+        raise ValueError(f"Недопустимое значение: {command} {value}")
 
     # Проверяем под диапазон
     if not 1 <= value <= 1000:
-        raise ValueError(f"Выход за границы допустимых значений [1; 1000]: {value}")
+        raise ValueError(f"Выход за границы допустимых значений [1; 1000]: {command} {value}")
 
     return value
 
 
-def __check_offscreen():
+def __check_offscreen(command: str = ""):
     """Проверяем, вышел ли агент за экран"""
     global coords
     if not (0 <= coords[0] <= 20 and 0 <= coords[1] <= 20):
-        raise ValueError(f"Выход за пределы экрана! Координаты: {[coords[0] +1, coords[1] +1]}")
+        raise ValueError(f"Выход за пределы экрана! Координаты: {command} {[coords[0] +1, coords[1] +1]}")
 
 
 def pass_func(*args, **kwargs):
@@ -60,7 +60,7 @@ def pass_func(*args, **kwargs):
 def right(value: [str | int]):
     """Перемещаем вправо (принимает переменную или число)"""
     global coords, route
-    distance = __check_available_value(value)
+    distance = __check_available_value(value, command="RIGHT")
     coords[0] += distance
 
     # Если вышли за пределы, то упираемся в стенку
@@ -75,7 +75,7 @@ def right(value: [str | int]):
 def left(value: [str | int]):
     """Перемещаем влево (принимает переменную или число)"""
     global coords, route
-    distance = __check_available_value(value)
+    distance = __check_available_value(value, command="LEFT")
     coords[0] -= distance
 
     # Если вышли за пределы, то упираемся в стенку
@@ -90,7 +90,7 @@ def left(value: [str | int]):
 def up(value: [str | int]):
     """Перемещаем вверх (принимает переменную или число)"""
     global coords, route
-    distance = __check_available_value(value)
+    distance = __check_available_value(value, command="UP")
     coords[1] -= distance
 
     # Если вышли за пределы, то упираемся в стенку
@@ -105,7 +105,7 @@ def up(value: [str | int]):
 def down(value: [str | int]):
     """Перемещаем вниз (принимает переменную или число)"""
     global coords, route
-    distance = __check_available_value(value)
+    distance = __check_available_value(value, command="DOWN")
     coords[1] += distance
 
     # Если вышли за пределы, то упираемся в стенку
@@ -126,7 +126,7 @@ def set(variable_and_value: str):
     if name_var[0].isdigit():
         raise NameError(f"Недопустимое имя переменной: {name_var}")
 
-    value = __check_available_value(value)
+    value = __check_available_value(value, command="SET")
 
     vars[name_var] = value
 
@@ -139,7 +139,10 @@ def call(name_proc: str):
         raise ValueError(f"Неизвестное название процедуры: {name_proc}")
 
     # Код процедуры выполняем отдельно
-    run_code(procedure_code)
+    _, err = run_code(procedure_code)
+
+    # Возвращаем ошибку вверх к главному run_code
+    if err: raise err
 
 
 # Сюда записываем все команды в формате: ["имя_команды": функция]
@@ -197,7 +200,7 @@ def iter_command(code: list[str], command_ind: int) -> int:
             endrepeat_index += 1
 
         # Проверяем правильность value (может быть как числом так и переменной)
-        value = __check_available_value(value)
+        value = __check_available_value(value, command=command)
 
         for N in range(value):
             index = startrepeat_index
@@ -228,12 +231,12 @@ def iter_command(code: list[str], command_ind: int) -> int:
 
     elif command in ("LEFT", "RIGHT", "UP", "DOWN"):
         # Проверяем правильность value для команд right/left/up/down
-        value = __check_available_value(value)
+        value = __check_available_value(value, command=command)
 
     try:
         # Просто выполняем команду без всяких заморочек
         all_commands[command](value)
-    except:
+    except KeyError:
         raise NameError(f"Неизвестная команда: {command}")
 
     # Добавляем координаты в маршрут
