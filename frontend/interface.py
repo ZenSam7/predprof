@@ -31,6 +31,9 @@ class my_window(QtWidgets.QMainWindow):
         self.game_y = 30
         self.game_size = 21 * 34
 
+        # Остановлен ли интерфейс
+        self.stopped = False
+
         # Оттрисовываем изначально эти координаты
         self.route = [[0, 0]]
 
@@ -73,7 +76,9 @@ class my_window(QtWidgets.QMainWindow):
 
         for db_save_name in db_titles_saves():
             def close_name_for_export(name: str):
-                def export_from_db(): nonlocal name; self.ui.textEdit.setText(db_load(name))
+                def export_from_db():
+                    nonlocal name
+                    self.ui.textEdit.setText(db_load(name))
 
                 return export_from_db
 
@@ -123,6 +128,7 @@ class my_window(QtWidgets.QMainWindow):
         """Останавливаем код"""
         self.game.should_here = self.game.coords
         self.route = []
+        self.stopped = True
 
     def save(self):
         """Сохраняем сохранение"""
@@ -153,6 +159,7 @@ class my_window(QtWidgets.QMainWindow):
         self.game.coords = [0, 0]
         self.game.should_here = [0, 0]
         self.game.move_cube((0, 0))
+        self.stopped = False
         self.start_code()
 
     def start_code(self):
@@ -188,6 +195,12 @@ class my_window(QtWidgets.QMainWindow):
             p.drawImage(self.game_x, self.game_y, img)
 
     def excepthook(self, exc_type, exc_value, exc_traceback):
+        # Если мы остановили Исполнителя и запускаем его при помощи "Старт",
+        # то не выводим ошибки "Процедура .. уже объявлена"
+        if self.stopped:
+            self.stopped = False
+            return
+
         # Выполните здесь ваш код обработки исключений
         # Например, отобразите диалоговое окно с информацией об ошибке
         error_message = f"{exc_type.__name__}: {exc_value}"

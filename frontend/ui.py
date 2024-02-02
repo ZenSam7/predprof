@@ -152,7 +152,7 @@ class Ui_MainWindow(object):
 
         self.button_start.setText(_translate("MainWindow", "СТАРТ"))
         self.button_start_with_reset.setText(_translate("MainWindow", "СТАРТ СО\nСБРОСОМ"))
-        self.button_stop.setText(_translate("MainWindow", "СТОП"))
+        self.button_stop.setText(_translate("MainWindow", "ПАУЗА"))
         self.button_reformat.setText(_translate("MainWindow", "ФОРМАТИРОВАТЬ\nКОД"))
 
         self.menu_file.setTitle(_translate("MainWindow", "Файл"))
