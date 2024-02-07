@@ -46,9 +46,10 @@ class my_window(QtWidgets.QMainWindow):
 
         # Если у нас в file_path путь, возвращаем путь
         # Если у нас в file_path имя на сохранение в бд, возвращаем сохранение
-        def getter_fite_path(string): return db_load(string) if "/" in string else string
+        def getter_fite_path(): return db_load(self.file_path) if "/" in self.file_path else self.file_path
         # Заголовок текущего файла
         self.file_path = property(getter_fite_path)
+        self.file_path = ""
 
         # При нажатии на кнопку запускаем или форматируем код
         self.ui.button_start.clicked.connect(self.start_code)
@@ -64,6 +65,7 @@ class my_window(QtWidgets.QMainWindow):
         self.ui.actionImport_file.triggered.connect(self.import_file)
         self.ui.actionImport_db.triggered.connect(self.import_db)
         self.ui.export_menu.triggered.connect(self.export_from_submenu)
+        self.export_from_submenu()
 
         # Отрисовка таблицы
         self.timer = QTimer()
@@ -72,15 +74,23 @@ class my_window(QtWidgets.QMainWindow):
 
     def export_from_submenu(self):
         """Назначаем каждому сохранению всё замыкание для загрузки в окно"""
-        self.ui.update_submenu()
-
         for db_save_name in db_titles_saves():
             def close_name_for_export(name: str):
                 def export_from_db():
                     nonlocal name
                     self.ui.textEdit.setText(db_load(name))
 
+                    # Чтобы у нас каждый раз изменялось количество кнопок
+                    self.export_from_submenu()
+
                 return export_from_db
+
+            # Добавляем Кнопку
+            if not ("save_for_sub_menu_" + db_save_name in self.ui.__dict__):
+                # Добавляем сохранение в меню Экспорт
+                self.ui.__dict__["save_for_sub_menu_" + db_save_name] = QtWidgets.QAction(self.ui.MainWindow)
+                self.ui.__dict__["save_for_sub_menu_" + db_save_name].setText(db_save_name)
+                self.ui.export_menu.addAction(self.ui.__dict__["save_for_sub_menu_" + db_save_name])
 
             self.ui.__dict__["save_for_sub_menu_" + db_save_name].triggered.connect(
                 close_name_for_export(db_save_name)
@@ -93,7 +103,7 @@ class my_window(QtWidgets.QMainWindow):
     def import_db(self):
         """Импортируем из окна редактирования"""
         file_path, _ = QFileDialog.getSaveFileName(
-            self, "Сохранить файл", "", "Название файла для сохранения в бд (*.only_name)")
+            self, "Сохранить файл", "", "Введите название для сохранения в бд ()")
 
         # Нам нужно только имя для сохранения в бд
         save_name = file_path.split("/")[-1].split(".")[0]
@@ -101,19 +111,20 @@ class my_window(QtWidgets.QMainWindow):
         # Сохраняем в бд
         db_save(save_name, self.ui.textEdit.toPlainText())
 
+        # Добавляем сохранение в меню Экспорт
+        self.export_from_submenu()
+
     def import_file(self):
-        # Если мы открыли или уже ранее сохраняли файлы, то не парим пользователя
-        if self.file_path:
-            import_from_file(self.file_path)
-        else:
-            self.open_file()
-            import_from_file(self.file_path)
+        self.open_file()
+        import_from_file(self.file_path)
+
+        # Добавляем сохранение в меню Экспорт
+        self.export_from_submenu()
 
     def format_code(self):
         """Форматируем код в редакторе кода"""
         raw_code = self.ui.textEdit.toPlainText().split("\n")
         norm_code = code_for_user(raw_code)
-        print(norm_code)
         self.ui.textEdit.setText("".join(norm_code))
 
     def open_file(self):
@@ -206,7 +217,7 @@ class my_window(QtWidgets.QMainWindow):
         error_message = f"{exc_type.__name__}: {exc_value}"
 
         # ДЛЯ ДЕБАГА
-        # error_message += f"{exc_traceback.__name__}"
+        error_message += f"{exc_traceback.__name__}"
 
         self.ui.textEdit_2.setText(error_message)
 

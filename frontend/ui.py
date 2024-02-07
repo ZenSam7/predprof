@@ -112,12 +112,15 @@ class Ui_MainWindow(object):
         self.actionExport_as_txt.setObjectName("actionExport_as_txt")
         self.menu_export_import.addAction(self.actionExport_as_txt)
 
-        # Всплывашка впслывашки
+        # Всплывашка всплывашки
         self.export_menu = QtWidgets.QMenu(self.menubar)
         self.export_menu.setObjectName("export_menu")
         self.export_menu.setTitle("Экспорт:")
 
-        self.update_submenu()
+        for db_save_name in db_titles_saves():
+            self.__dict__["save_for_sub_menu_" + db_save_name] = QtWidgets.QAction(self.MainWindow)
+            self.__dict__["save_for_sub_menu_" + db_save_name].setText(db_save_name)
+            self.export_menu.addAction(self.__dict__["save_for_sub_menu_" + db_save_name])
 
         self.menu_export_import.addMenu(self.export_menu)
 
@@ -126,22 +129,6 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
-
-    def update_submenu(self):
-        """Обновляем подменю для экспорта"""
-        # Очищаем
-        del self.export_menu
-
-        # Переопределяем
-        self.export_menu = QtWidgets.QMenu(self.menubar)
-        self.export_menu.setObjectName("export_menu")
-        self.export_menu.setTitle("Экспорт:")
-
-        for db_save in db_titles_saves():
-            self.__dict__["save_for_sub_menu_" + db_save] = QtWidgets.QAction(self.MainWindow)
-            self.__dict__["save_for_sub_menu_" + db_save].setText(db_save)
-
-            self.export_menu.addAction(self.__dict__["save_for_sub_menu_" + db_save])
 
     def retranslateUi(self, MainWindow):
         """Даём стили и названия"""
