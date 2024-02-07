@@ -64,37 +64,60 @@ class my_window(QtWidgets.QMainWindow):
         self.ui.actionExport_as_txt.triggered.connect(self.export_as_txt)
         self.ui.actionImport_file.triggered.connect(self.import_file)
         self.ui.actionImport_db.triggered.connect(self.import_db)
-        self.ui.export_menu.triggered.connect(self.export_from_submenu)
-        self.export_from_submenu()
+        self.update_submenus()
 
         # Отрисовка таблицы
         self.timer = QTimer()
         self.timer.timeout.connect(self.pygame_loop)
         self.timer.start(1)
 
-    def export_from_submenu(self):
-        """Назначаем каждому сохранению всё замыкание для загрузки в окно"""
+    def update_submenus(self):
+        """Назначаем каждому сохранению для экспорта/удаления своё замыкание/функционал"""
+        def close_name_for_export(name: str):
+            def export_from_db():
+                nonlocal name
+                self.ui.textEdit.setText(db_load(name))
+
+                # Чтобы у нас каждый раз изменялось количество кнопок
+                self.update_submenus()
+
+            return export_from_db
+
+        def close_name_for_remove(name: str):
+            def remove_from_db():
+                nonlocal name
+                db_delete(name)
+
+                # Удаляем и из субменюшек
+                try:
+                    self.ui.export_menu.removeAction(self.ui.__dict__["export_for_sub_menu_" + name])
+                    self.ui.delete_menu.removeAction(self.ui.__dict__["deleting_for_sub_menu_" + name])
+                    self.ui.__dict__.pop("deleting_for_sub_menu_" + name)
+                    self.ui.__dict__.pop("export_for_sub_menu_" + name)
+                except Exception as err:
+                    pass
+
+            return remove_from_db
+
         for db_save_name in db_titles_saves():
-            def close_name_for_export(name: str):
-                def export_from_db():
-                    nonlocal name
-                    self.ui.textEdit.setText(db_load(name))
+            # Для простоты
+            del_name = "deleting_for_sub_menu_" + db_save_name
+            exp_name = "export_for_sub_menu_" + db_save_name
 
-                    # Чтобы у нас каждый раз изменялось количество кнопок
-                    self.export_from_submenu()
+            # Добавляем кнопку, если её нету
+            if not ((del_name in self.ui.__dict__) or (exp_name in self.ui.__dict__)):
+                # Добавляем сохранение в меню Экспорт и Удалить
+                for name in (exp_name, del_name):
+                    self.ui.__dict__[name] = QtWidgets.QAction(self.ui.MainWindow)
+                    self.ui.__dict__[name].setText(db_save_name)
 
-                return export_from_db
+                self.ui.export_menu.addAction(self.ui.__dict__[exp_name])
+                self.ui.delete_menu.addAction(self.ui.__dict__[del_name])
 
-            # Добавляем Кнопку
-            if not ("save_for_sub_menu_" + db_save_name in self.ui.__dict__):
-                # Добавляем сохранение в меню Экспорт
-                self.ui.__dict__["save_for_sub_menu_" + db_save_name] = QtWidgets.QAction(self.ui.MainWindow)
-                self.ui.__dict__["save_for_sub_menu_" + db_save_name].setText(db_save_name)
-                self.ui.export_menu.addAction(self.ui.__dict__["save_for_sub_menu_" + db_save_name])
-
-            self.ui.__dict__["save_for_sub_menu_" + db_save_name].triggered.connect(
-                close_name_for_export(db_save_name)
-            )
+            # При нажатии на кнопку, код появляется на экране
+            self.ui.__dict__[exp_name].triggered.connect(close_name_for_export(db_save_name))
+            # Автоудаляем кнопку при нажатии
+            self.ui.__dict__[del_name].triggered.connect(close_name_for_remove(db_save_name))
 
     def export_as_txt(self):
         # ))))))
@@ -112,14 +135,17 @@ class my_window(QtWidgets.QMainWindow):
         db_save(save_name, self.ui.textEdit.toPlainText())
 
         # Добавляем сохранение в меню Экспорт
-        self.export_from_submenu()
+        self.update_submenus()
 
     def import_file(self):
         self.open_file()
-        import_from_file(self.file_path)
+        if self.file_path:
+            import_from_file(self.file_path)
+        else:
+            raise Exception("Файл не выбран")
 
         # Добавляем сохранение в меню Экспорт
-        self.export_from_submenu()
+        self.update_submenus()
 
     def format_code(self):
         """Форматируем код в редакторе кода"""

@@ -112,18 +112,27 @@ class Ui_MainWindow(object):
         self.actionExport_as_txt.setObjectName("actionExport_as_txt")
         self.menu_export_import.addAction(self.actionExport_as_txt)
 
-        # Всплывашка всплывашки
+        # Всплывашки всплывашки
+        self.delete_menu = QtWidgets.QMenu(self.menubar)
+        self.delete_menu.setObjectName("delete_menu")
+
         self.export_menu = QtWidgets.QMenu(self.menubar)
         self.export_menu.setObjectName("export_menu")
-        self.export_menu.setTitle("Экспорт:")
 
         for db_save_name in db_titles_saves():
-            self.__dict__["save_for_sub_menu_" + db_save_name] = QtWidgets.QAction(self.MainWindow)
-            self.__dict__["save_for_sub_menu_" + db_save_name].setText(db_save_name)
-            self.export_menu.addAction(self.__dict__["save_for_sub_menu_" + db_save_name])
+            self.__dict__["export_for_sub_menu_" + db_save_name] = QtWidgets.QAction(self.MainWindow)
+            self.__dict__["export_for_sub_menu_" + db_save_name].setText(db_save_name)
+            self.export_menu.addAction(self.__dict__["export_for_sub_menu_" + db_save_name])
+
+            # Делуем глубокую копию кнопок, специально для удаления
+            self.__dict__["deleting_for_sub_menu_" + db_save_name] = QtWidgets.QAction(self.MainWindow)
+            self.__dict__["deleting_for_sub_menu_" + db_save_name].setText(db_save_name)
+            self.delete_menu.addAction(self.__dict__["deleting_for_sub_menu_" + db_save_name])
 
         self.menu_export_import.addMenu(self.export_menu)
+        self.menu_export_import.addMenu(self.delete_menu)
 
+        # Добавляем элементы меню в прогу
         self.menubar.addAction(self.menu_file.menuAction())
         self.menubar.addAction(self.menu_export_import.menuAction())
 
@@ -151,4 +160,5 @@ class Ui_MainWindow(object):
         self.actionExport_as_txt.setText(_translate("MainWindow", "Экспортировать как txt"))
         self.actionImport_db.setText(_translate("MainWindow", "Импортировать в бд"))
         self.actionImport_file.setText(_translate("MainWindow", "Импортировать файл"))
-
+        self.export_menu.setTitle("Экспорт:")
+        self.delete_menu.setTitle("Удалить:")
