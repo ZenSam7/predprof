@@ -11,8 +11,3 @@ file = "user_code"  # Имя рабочего файла из txt_saves
 reformat_user_file_code(f"./txt_saves/{file}.txt", "./txt_saves/code.txt")
 
 begin_app()
-
-# run_code(
-#     code_for_interpeter(open("./txt_saves/user_code.txt", "r", encoding="utf-16").readlines()),
-#     Game()
-# )

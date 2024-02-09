@@ -59,6 +59,7 @@ class my_window(QtWidgets.QMainWindow):
 
         # Подключаем команды к кнопкам
         self.ui.actionOpen_txt.triggered.connect(self.open_file)
+        self.ui.actionNew_file.triggered.connect(lambda: self.ui.textEdit.setText(""))
         self.ui.actionSave.triggered.connect(self.save)
         self.ui.actionSave_as_txt.triggered.connect(self.save_as_txt)
         self.ui.actionExport_as_txt.triggered.connect(self.export_as_txt)
@@ -206,7 +207,7 @@ class my_window(QtWidgets.QMainWindow):
         # В route записываем последовательность координат по которым надо пройтись,
         # и потом рисуем агента в paintEvent по 1 клетке
         self.route, err = run_code(code_for_interpeter(code))
-        self.ui.textEdit_2.setText("Всё хорошо")
+        self.ui.programm_massege.setText("Всё хорошо")
 
         if err is not None:
             raise err
@@ -245,7 +246,7 @@ class my_window(QtWidgets.QMainWindow):
         # ДЛЯ ДЕБАГА
         error_message += f"{exc_traceback.__name__}"
 
-        self.ui.textEdit_2.setText(error_message)
+        self.ui.programm_massege.setText(error_message)
 
 
 def begin_app():

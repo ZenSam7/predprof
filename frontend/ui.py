@@ -17,20 +17,20 @@ class Ui_MainWindow(object):
         self.scrollArea.setObjectName("scrollArea")
 
         self.scrollAreaWidgetContents_2 = QtWidgets.QWidget()
-        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 548, 198))
+        self.scrollAreaWidgetContents_2.setGeometry(QtCore.QRect(0, 0, 548, 218))
         self.scrollAreaWidgetContents_2.setObjectName("scrollAreaWidgetContents_2")
         self.scrollArea_2 = QtWidgets.QScrollArea(self.centralwidget)
 
-        self.scrollArea_2.setGeometry(QtCore.QRect(30, 550, 550, 200))
+        self.scrollArea_2.setGeometry(QtCore.QRect(30, 550, 550, 175))
         self.scrollArea_2.setWidgetResizable(True)
         self.scrollArea_2.setObjectName("scrollArea_2")
         self.scrollArea_2.setWidget(self.scrollAreaWidgetContents_2)
 
-        self.textEdit_2 = QtWidgets.QTextEdit(self.scrollAreaWidgetContents_2)
-        self.textEdit_2.setGeometry(QtCore.QRect(0, 0, 550, 200))
-        self.textEdit_2.setReadOnly(True)
-        self.textEdit_2.setObjectName("textEdit_2")
-        self.textEdit_2.setStyleSheet('''QTextEdit {font: 14pt "Consolas";}''')
+        self.programm_massege = QtWidgets.QTextEdit(self.scrollAreaWidgetContents_2)
+        self.programm_massege.setGeometry(QtCore.QRect(0, 0, 550, 175))
+        self.programm_massege.setReadOnly(True)
+        self.programm_massege.setObjectName("programm_massege")
+        self.programm_massege.setStyleSheet('''QTextEdit {font: 14pt "Consolas";}''')
 
         self.scrollAreaWidgetContents = QtWidgets.QWidget()
         self.scrollAreaWidgetContents.setGeometry(QtCore.QRect(0, 0, 548, 418))
@@ -84,6 +84,10 @@ class Ui_MainWindow(object):
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
         MainWindow.setStatusBar(self.statusbar)
+
+        self.actionNew_file = QtWidgets.QAction(MainWindow)
+        self.actionNew_file.setObjectName("actionNew_file")
+        self.menu_file.addAction(self.actionNew_file)
 
         self.actionOpen_txt = QtWidgets.QAction(MainWindow)
         self.actionOpen_txt.setObjectName("actionOpen_txt")
@@ -142,9 +146,10 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         """Даём стили и названия"""
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Нейрошарики: GridMaster"))
+        MainWindow.setWindowIcon(QtGui.QIcon("./frontend/Icon.ico"))
         self.textEdit.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">fdfsd</span></p></body></html>"))
-        self.textEdit_2.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">Всё работает</span></p></body></html>"))
+        self.programm_massege.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">Всё работает</span></p></body></html>"))
 
         self.button_start.setText(_translate("MainWindow", "СТАРТ"))
         self.button_start_with_reset.setText(_translate("MainWindow", "СТАРТ СО\nСБРОСОМ"))
@@ -152,6 +157,7 @@ class Ui_MainWindow(object):
         self.button_reformat.setText(_translate("MainWindow", "ФОРМАТИРОВАТЬ\nКОД"))
 
         self.menu_file.setTitle(_translate("MainWindow", "Файл"))
+        self.actionNew_file.setText(_translate("MainWindow", "Новый файл"))
         self.actionSave.setText(_translate("MainWindow", "Сохранить"))
         self.actionOpen_txt.setText(_translate("MainWindow", "Открыть файл"))
         self.actionSave_as_txt.setText(_translate("MainWindow", "Сохранить как txt"))
