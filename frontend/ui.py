@@ -116,6 +116,14 @@ class Ui_MainWindow(object):
         self.actionExport_as_txt.setObjectName("actionExport_as_txt")
         self.menu_export_import.addAction(self.actionExport_as_txt)
 
+        self.actionSave_coords = QtWidgets.QAction(MainWindow)
+        self.actionSave_coords.setObjectName("actionSave_coords")
+        self.menu_file.addAction(self.actionSave_coords)
+
+        self.actionLoad_coords = QtWidgets.QAction(MainWindow)
+        self.actionLoad_coords.setObjectName("actionLoad_coords")
+        self.menu_file.addAction(self.actionLoad_coords)
+
         # Всплывашки всплывашки
         self.delete_menu = QtWidgets.QMenu(self.menubar)
         self.delete_menu.setObjectName("delete_menu")
@@ -147,7 +155,7 @@ class Ui_MainWindow(object):
         """Даём стили и названия"""
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Нейрошарики: GridMaster"))
-        MainWindow.setWindowIcon(QtGui.QIcon("./frontend/Icon.ico"))
+        MainWindow.setWindowIcon(QtGui.QIcon("./_internal/frontend/Icon.ico"))
         self.textEdit.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">fdfsd</span></p></body></html>"))
         self.programm_massege.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\np, li { white-space: pre-wrap; }\n</style></head><body style=\" font-family:\'MS Shell Dlg 2\'; font-size:8.25pt; font-weight:400; font-style:normal;\">\n<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-size:14pt;\">Всё работает</span></p></body></html>"))
 
@@ -157,6 +165,8 @@ class Ui_MainWindow(object):
         self.button_reformat.setText(_translate("MainWindow", "ФОРМАТИРОВАТЬ\nКОД"))
 
         self.menu_file.setTitle(_translate("MainWindow", "Файл"))
+        self.actionSave_coords.setText(_translate("MainWindow", "Сохранить координаты"))
+        self.actionLoad_coords.setText(_translate("MainWindow", "Загрузить координаты"))
         self.actionNew_file.setText(_translate("MainWindow", "Новый файл"))
         self.actionSave.setText(_translate("MainWindow", "Сохранить"))
         self.actionOpen_txt.setText(_translate("MainWindow", "Открыть файл"))

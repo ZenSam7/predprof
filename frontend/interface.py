@@ -20,7 +20,7 @@ import asyncio
 
 
 class my_window(QtWidgets.QMainWindow):
-    def __init__(self, file="./txt_saves/code.txt"):
+    def __init__(self, file="./_internal/txt_saves/code.txt"):
         """Инициализация окна"""
         super(my_window, self).__init__()
         self.ui = Ui_MainWindow()
@@ -60,6 +60,8 @@ class my_window(QtWidgets.QMainWindow):
         # Подключаем команды к кнопкам
         self.ui.actionOpen_txt.triggered.connect(self.open_file)
         self.ui.actionNew_file.triggered.connect(lambda: self.ui.textEdit.setText(""))
+        self.ui.actionSave_coords.triggered.connect(self.save_coords)
+        self.ui.actionLoad_coords.triggered.connect(self.load_coords)
         self.ui.actionSave.triggered.connect(self.save)
         self.ui.actionSave_as_txt.triggered.connect(self.save_as_txt)
         self.ui.actionExport_as_txt.triggered.connect(self.export_as_txt)
@@ -162,6 +164,25 @@ class my_window(QtWidgets.QMainWindow):
                 self.ui.textEdit.setText(file.read())
                 self.file_path = file_path
 
+    def load_coords(self):
+        """Загружаем координаты"""
+        file_path, _ = QFileDialog.getOpenFileName(self, "Открыть координаты", "", "Координаты (*.coords)")
+        if file_path:
+            with open(file_path, "r", encoding="utf-16") as file:
+                for coord_str in file.readlines():
+                    self.route_conts.append(list(map(int, coord_str.split())))
+                    self.route.append(list(map(int, coord_str.split())))
+                self.game.coords = self.route[0]
+                self.game.should_here = self.route[0]
+
+    def save_coords(self):
+        """Сохраняем координаты"""
+        file_path, _ = QFileDialog.getSaveFileName(self, "Сохранить координаты", "", "Координаты (*.coords)")
+        if file_path:
+            with open(file_path, "w+", encoding="utf-16") as file:
+                for coord in self.route_conts:
+                    file.write(f"{coord[0]} {coord[1]}\n")
+
     def stop_code(self):
         """Останавливаем код"""
         self.game.should_here = self.game.coords
@@ -202,11 +223,11 @@ class my_window(QtWidgets.QMainWindow):
 
     def start_code(self):
         code = self.ui.textEdit.toPlainText().split('\n')
-        print(code)
 
         # В route записываем последовательность координат по которым надо пройтись,
         # и потом рисуем агента в paintEvent по 1 клетке
         self.route, err = run_code(code_for_interpeter(code))
+        self.route_conts = [i.copy() for i in self.route]
         self.ui.programm_massege.setText("Всё хорошо")
 
         if err is not None:
@@ -244,7 +265,7 @@ class my_window(QtWidgets.QMainWindow):
         error_message = f"{exc_type.__name__}: {exc_value}"
 
         # ДЛЯ ДЕБАГА
-        error_message += f"{exc_traceback.__name__}"
+        # error_message += f"{exc_traceback.__name__}"
 
         self.ui.programm_massege.setText(error_message)
 

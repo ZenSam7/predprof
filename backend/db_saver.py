@@ -7,7 +7,7 @@ def _do_request(request: str):
     """Выполняет запрос к бд"""
     conn, result = None, None
     try:
-        conn = sqlite3.connect("saves.db")
+        conn = sqlite3.connect("./_internal/saves.db")
         cur = conn.cursor()
 
         # Добавляем ";"
@@ -78,10 +78,10 @@ def export_to_txt(name: str):
     name = name.split(".")[0] if "." in name else name
 
     # Если файл уже есть, то заменяем
-    if (name + ".txt") in os.listdir("./txt_saves"):
-        os.remove(f"txt_saves/{name}.txt")
+    if (name + ".txt") in os.listdir("./_internal/txt_saves"):
+        os.remove(f"./_internal/txt_saves/{name}.txt")
 
-    with open(f"txt_saves/{name}.txt", "w+", encoding="utf-16") as file:
+    with open(f"./_internal/txt_saves/{name}.txt", "w+", encoding="utf-16") as file:
         file.write(db_load(name))
 
 
